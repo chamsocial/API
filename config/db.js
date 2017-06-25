@@ -1,23 +1,25 @@
 module.exports = {
   'development': {
-    'username': 'root',
-    'password': null,
-    'database': 'database_development',
-    'host': '127.0.0.1',
+    'username': process.env.MYSQL_USER,
+    'password': process.env.MYSQL_PASSWORD,
+    'database': process.env.MYSQL_DATABASE || 'chamsocial',
+    'host': process.env.MYSQL_HOST || '127.0.0.1',
     'dialect': 'mysql'
   },
-  'test': {
-    'username': 'root',
-    'password': null,
-    'database': 'database_test',
-    'host': '127.0.0.1',
-    'dialect': 'mysql'
+  test: {
+    database: 'cham_test_db',
+    username: 'root',
+    password: null,
+    host: '127.0.0.1',
+    dialect: 'sqlite',
+    storage: ':memory:',
+    logging: () => {}
   },
   'production': {
-    'username': 'root',
-    'password': null,
-    'database': 'database_production',
-    'host': '127.0.0.1',
+    'username': process.env.MYSQL_USER,
+    'password': process.env.MYSQL_PASSWORD,
+    'database': process.env.MYSQL_DATABASE || 'chamsocial',
+    'host': process.env.MYSQL_HOST || '127.0.0.1',
     'dialect': 'mysql'
   }
 }
