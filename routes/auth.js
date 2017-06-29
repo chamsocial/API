@@ -5,25 +5,24 @@ const jwt = require('jsonwebtoken')
 const { User } = require('../models')
 const { JWT_SECRET, JWT_EXPIRE } = process.env
 
-function invalidUser (ctx, title = 'Invalid username or password') {
-  ctx.status = 401
-  ctx.body = {
-    errors: [{ title }]
-  }
+function invalidUserError (title = 'Invalid username or password') {
+  const error = new Error(title)
+  error.status = 401
+  return error
 }
 
 router.post('/login', async (ctx, next) => {
   const { username, password } = ctx.request.body
-  if (!username || !password) return invalidUser(ctx)
+  if (!username || !password) ctx.throw(invalidUserError())
 
   const user = await User.findOne({ where: { $or: [{ username }, { email: username }] } })
-  if (!user) return invalidUser(ctx)
+  if (!user) ctx.throw(invalidUserError())
 
   const activationText = 'The account has not been activated yet. If you have not received the email try to reset your password.'
-  if (!user.hasActivated()) return invalidUser(ctx, activationText)
+  if (!user.hasActivated()) ctx.throw(invalidUserError(activationText))
 
   const validPassword = await user.validPassword(password)
-  if (!validPassword) return invalidUser(ctx)
+  if (!validPassword) ctx.throw(invalidUserError())
 
   await user.updateAttributes({ last_login: new Date() })
 
