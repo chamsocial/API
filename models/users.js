@@ -3,8 +3,8 @@ const bcrypt = require('bcryptjs')
 
 module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define('User', {
-    username: { type: DataTypes.STRING(60), allowNull: false },
-    email: { type: DataTypes.STRING, allowNull: false },
+    username: { type: DataTypes.STRING(60), allowNull: false, unique: true },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
     email_domain: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     bouncing: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     password: { type: DataTypes.STRING(60), allowNull: false, defaultValue: '' },
@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
     interests: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     aboutme: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     jobtitle: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
-    slug: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
+    slug: { type: DataTypes.STRING, allowNull: false, defaultValue: '', unique: true },
     lang: { type: DataTypes.STRING, allowNull: false, defaultValue: 'en' },
     role: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: 0 },
@@ -38,6 +38,10 @@ module.exports = function (sequelize, DataTypes) {
 
   User.prototype.validPassword = function (password) {
     return bcrypt.compare(password, this.password)
+  }
+
+  User.prototype.hasActivated = function () {
+    return !!this.activated
   }
 
   return User
