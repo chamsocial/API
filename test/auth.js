@@ -12,6 +12,7 @@ const user = {
   username: 'Lorem',
   email: 'lorem@ipsum.dolor',
   password: 'liveuniverse42',
+  slug: 'lorem',
   activated: 1
 }
 
@@ -64,9 +65,10 @@ describe('Login', () => {
 
   it('should return an error if not activated', async () => {
     const spamUser = {
-      username: 'Spammer',
+      username: 'Spammer74',
       email: 'Mohahaha@ipsum.dolor',
       password: 'spamspamspam',
+      slug: 'spammer74',
       activated: 0
     }
     await User.create(spamUser)
@@ -77,6 +79,18 @@ describe('Login', () => {
       .then((res) => {
         expect(res.body.errors[0].title).to.include('activated')
         expect(res.status).to.equal(401)
+      })
+  })
+
+  it('should return an object containing a accessToken', () => {
+    return request
+      .post('/v2/login')
+      .send({ username: user.username, password: user.password })
+      .then((res) => {
+        expect(res.body).to.include.key('user')
+        expect(res.body.user).to.not.include.key('password')
+        expect(res.body).to.include.key('token')
+        expect(res.status).to.equal(200)
       })
   })
 })

@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
     interests: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     aboutme: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     jobtitle: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
-    slug: { type: DataTypes.STRING, allowNull: false, defaultValue: '', unique: true },
+    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
     lang: { type: DataTypes.STRING, allowNull: false, defaultValue: 'en' },
     role: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: 0 },
@@ -42,6 +42,27 @@ module.exports = function (sequelize, DataTypes) {
 
   User.prototype.hasActivated = function () {
     return !!this.activated
+  }
+
+  User.prototype.getPublicData = function () {
+    const fields = [
+      'id',
+      'username',
+      'slug',
+      'lang',
+      'first_name',
+      'last_name',
+      'created_at',
+      'company_name',
+      'location',
+      'interests',
+      'aboutme',
+      'jobtitle'
+    ]
+    return fields.reduce((data, field) => {
+      data[field] = this[field]
+      return data
+    }, {})
   }
 
   return User

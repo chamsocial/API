@@ -1,7 +1,9 @@
 const router = require('koa-router')()
 router.prefix('/v2')
+const jwt = require('jsonwebtoken')
 
 const { User } = require('../models')
+const { JWT_SECRET, JWT_EXPIRE } = process.env
 
 function invalidUser (ctx, title = 'Invalid username or password') {
   ctx.status = 401
@@ -23,9 +25,10 @@ router.post('/login', async (ctx, next) => {
   const validPassword = await user.validPassword(password)
   if (!validPassword) return invalidUser(ctx)
 
-  // @TODO generate jwt token
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE })
   ctx.body = {
-    user
+    user: user.getPublicData(),
+    token
   }
 })
 
