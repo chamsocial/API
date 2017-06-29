@@ -17,16 +17,8 @@ onerror(app)
 // middlewares
 app.use(bodyparser({ enableTypes: ['json', 'form', 'text'] }))
 app.use(json())
-app.use(logger())
+if (process.env.NODE_ENV !== 'test') app.use(logger())
 app.use(staticFiles(path.join(__dirname, '/public')))
-
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
 
 // routes
 app.use(auth.routes(), auth.allowedMethods())
