@@ -25,6 +25,8 @@ router.post('/login', async (ctx, next) => {
   const validPassword = await user.validPassword(password)
   if (!validPassword) return invalidUser(ctx)
 
+  await user.updateAttributes({ last_login: new Date() })
+
   const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRE })
   ctx.body = {
     user: user.getPublicData(),

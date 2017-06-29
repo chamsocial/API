@@ -17,9 +17,11 @@ const user = {
 }
 
 describe('Login', () => {
+  let dbUser = {}
   beforeEach(() => {
     return setup.initDB()
       .then(() => User.create(user))
+      .then(savedUser => (dbUser = savedUser))
   })
   afterEach(() => setup.destroyDB())
 
@@ -91,6 +93,17 @@ describe('Login', () => {
         expect(res.body.user).to.not.include.key('password')
         expect(res.body).to.include.key('token')
         expect(res.status).to.equal(200)
+      })
+  })
+
+  it('should return an object containing a accessToken', () => {
+    expect(dbUser.last_login).to.be.undefined // eslint-disable-line no-unused-expressions
+    return request
+      .post('/v2/login')
+      .send({ username: user.username, password: user.password })
+      .then(async (res) => {
+        const loggedInUser = await User.findById(dbUser.id)
+        expect(loggedInUser.last_login).to.not.be.undefined // eslint-disable-line no-unused-expressions
       })
   })
 })
