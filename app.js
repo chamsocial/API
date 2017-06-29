@@ -20,6 +20,16 @@ app.use(json())
 if (process.env.NODE_ENV !== 'test') app.use(logger())
 app.use(staticFiles(path.join(__dirname, '/public')))
 
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (err) {
+    ctx.status = err.status || 500
+    ctx.body = err.message
+    ctx.app.emit('error', err, ctx)
+  }
+})
+
 // routes
 app.use(auth.routes(), auth.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
