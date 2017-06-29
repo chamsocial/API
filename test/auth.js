@@ -40,10 +40,20 @@ describe('Login', () => {
       })
   })
 
-  it('should succed with valid credentials', () => {
+  it('should succeed with valid email & pasword', () => {
     return request
       .post('/v2/login')
       .send({ username: user.email, password: user.password })
+      .then((res) => {
+        expect(res.body.user).to.include.key('username')
+        expect(res.status).to.equal(200)
+      })
+  })
+
+  it('should also succeed with valid username', () => {
+    return request
+      .post('/v2/login')
+      .send({ username: user.username, password: user.password })
       .then((res) => {
         expect(res.body.user).to.include.key('username')
         expect(res.status).to.equal(200)
