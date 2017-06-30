@@ -10,7 +10,7 @@ const logger = require('koa-logger')
 const staticFiles = require('koa-static')
 
 const auth = require('./routes/auth')
-const users = require('./routes/users')
+const graphqlRoutes = require('./routes/graphql')
 
 // error handler
 onerror(app)
@@ -40,6 +40,6 @@ app.use(async (ctx, next) => {
 
 // routes
 app.use(auth.routes(), auth.allowedMethods())
-app.use(users.routes(), users.allowedMethods())
+app.use(graphqlRoutes.routes(), graphqlRoutes.allowedMethods())
 
 module.exports = app
