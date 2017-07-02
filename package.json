@@ -13,6 +13,7 @@
     "debug": "^2.6.3",
     "dotenv": "^4.0.0",
     "graphql": "^0.10.3",
+    "graphql-relay": "^0.5.2",
     "graphql-sequelize": "^5.3.3",
     "graphql-server-koa": "^1.0.0",
     "jsonwebtoken": "^7.4.1",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
+    "factory-girl": "^4.3.0",
     "mocha": "^3.4.2",
     "nodemon": "^1.8.1",
     "sqlite3": "^3.1.8",
