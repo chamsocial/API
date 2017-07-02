@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken')
 
+const { JWT_SECRET } = process.env
 const { User, Group, GroupContent, Post, sequelize } = require('../../models')
 
 const setup = {
@@ -14,6 +16,9 @@ const setup = {
   },
   destroyDB () {
     return sequelize.drop()
+  },
+  jwtToken (obj = { id: 42 }) {
+    return jwt.sign(obj, JWT_SECRET)
   }
 }
 
