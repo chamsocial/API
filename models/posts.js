@@ -29,5 +29,14 @@ module.exports = function (sequelize, DataTypes) {
     deletedAt: false
   })
 
+  Post.publicFields = [
+    'id',
+    'use_id',
+    'title',
+    'comments_count',
+    'created_at',
+    'slug'
+  ]
+
   return Post
 }

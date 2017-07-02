@@ -20,7 +20,21 @@ const schema = new GraphQLSchema({
       posts: {
         type: new GraphQLList(types.post),
         args: defaultListArgs(),
-        resolve: resolver(Post)
+        resolve: resolver(Post, {
+          before (findOptions, args, context, info) {
+            if (!context.user || context.user !== undefined) {
+              const sections = info.fieldNodes[0].selectionSet.selections
+              const fields = sections.map(selection => selection.name.value)
+              const errors = []
+              fields.forEach(f => {
+                if (!Post.publicFields.includes(f)) errors.push(f)
+              })
+              if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')}`)
+
+              return findOptions
+            }
+          }
+        })
       }
     }
   })

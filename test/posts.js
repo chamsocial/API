@@ -31,4 +31,22 @@ describe('Post routes', () => {
         expect(res.status).to.equal(200)
       })
   })
+
+  it('should only return limited fields when not logged in', () => {
+    const query = `{
+        posts {
+          id
+          slug
+          content
+          title
+        }
+      }`
+    return request
+      .post('/graphql')
+      .send({ operationName: null, query, variables: null })
+      .then((res) => {
+        expect(res.body.errors[0].message).to.contain('content')
+        expect(res.status).to.equal(200)
+      })
+  })
 })
