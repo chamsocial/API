@@ -1,8 +1,8 @@
 const router = require('koa-router')()
 const { graphqlKoa, graphiqlKoa } = require('graphql-server-koa')
-
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
 const { GraphQLObjectType, GraphQLList, GraphQLSchema } = require('graphql')
+const { decodeJwt } = require('./middleware')
 const { Post } = require('../models')
 
 const types = {
@@ -22,7 +22,7 @@ const schema = new GraphQLSchema({
         args: defaultListArgs(),
         resolve: resolver(Post, {
           before (findOptions, args, context, info) {
-            if (!context.user || context.user !== undefined) {
+            if (!context.userToken || context.userToken === undefined) {
               const sections = info.fieldNodes[0].selectionSet.selections
               const fields = sections.map(selection => selection.name.value)
               const errors = []
@@ -30,9 +30,9 @@ const schema = new GraphQLSchema({
                 if (!Post.publicFields.includes(f)) errors.push(f)
               })
               if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')}`)
-
-              return findOptions
             }
+
+            return findOptions
           }
         })
       }
@@ -40,9 +40,9 @@ const schema = new GraphQLSchema({
   })
 })
 
-router.post('/graphql', graphqlKoa(ctx => ({
+router.post('/graphql', decodeJwt, graphqlKoa(ctx => ({
   schema,
-  context: { user: ctx.user }
+  context: { userToken: ctx.userToken }
 })))
 
 router.get('/graphiql', graphiqlKoa({ endpointURL: '/graphql' }))

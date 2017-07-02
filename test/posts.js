@@ -32,7 +32,7 @@ describe('Post routes', () => {
       })
   })
 
-  it('should only return limited fields when not logged in', () => {
+  it('should throw an error if asking for private fields when not logged in', () => {
     const query = `{
         posts {
           id
@@ -46,6 +46,26 @@ describe('Post routes', () => {
       .send({ operationName: null, query, variables: null })
       .then((res) => {
         expect(res.body.errors[0].message).to.contain('content')
+        expect(res.status).to.equal(200)
+      })
+  })
+
+  it('should succeed when asking for private fields when logged in', () => {
+    const token = setup.jwtToken()
+    const query = `{
+        posts {
+          id
+          slug
+          content
+          title
+        }
+      }`
+    return request
+      .post('/graphql')
+      .send({ operationName: null, query, variables: null })
+      .set('Authorization', `bearer ${token}`)
+      .then((res) => {
+        expect(res.body.data.posts[0]).to.have.include.key('content')
         expect(res.status).to.equal(200)
       })
   })
