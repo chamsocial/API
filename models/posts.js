@@ -35,7 +35,8 @@ module.exports = function (sequelize, DataTypes) {
     'title',
     'comments_count',
     'created_at',
-    'slug'
+    'slug',
+    'author'
   ]
 
   return Post

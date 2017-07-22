@@ -3,13 +3,52 @@ const { graphqlKoa, graphiqlKoa } = require('graphql-server-koa')
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
 const { GraphQLObjectType, GraphQLList, GraphQLSchema } = require('graphql')
 const { decodeJwt } = require('./middleware')
-const { Post } = require('../models')
+const { Post, User } = require('../models')
+const assign = require('lodash.assign')
+
+const defaultModelArgs = defaultListArgs()
+
+function authResolver (Model) {
+  return resolver(Model, {
+    before (findOptions, args, context, info) {
+      if (!context.userToken || context.userToken === undefined) {
+        const sections = info.fieldNodes[0].selectionSet.selections
+        const fields = sections.map(selection => selection.name.value)
+        const errors = []
+        fields.forEach(f => {
+          if (f === '__typename') return
+          if (!Model.publicFields.includes(f)) errors.push(f)
+        })
+        if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')} on ${Model.name}`)
+      }
+
+      return findOptions
+    }
+  })
+}
 
 const types = {
   post: new GraphQLObjectType({
     name: 'Post',
     description: 'A post',
-    fields: attributeFields(Post)
+    fields: () => assign(attributeFields(Post), {
+      author: {
+        type: types.user,
+        args: defaultModelArgs,
+        resolve: authResolver(User)
+      }
+    })
+  }),
+  user: new GraphQLObjectType({
+    name: 'User',
+    description: 'A single user',
+    fields: () => assign(attributeFields(User), {
+      posts: {
+        type: new GraphQLList(types.post),
+        args: defaultModelArgs,
+        resolve: authResolver(Post)
+      }
+    })
   })
 }
 
@@ -20,22 +59,7 @@ const schema = new GraphQLSchema({
       posts: {
         type: new GraphQLList(types.post),
         args: defaultListArgs(),
-        resolve: resolver(Post, {
-          before (findOptions, args, context, info) {
-            if (!context.userToken || context.userToken === undefined) {
-              const sections = info.fieldNodes[0].selectionSet.selections
-              const fields = sections.map(selection => selection.name.value)
-              const errors = []
-              fields.forEach(f => {
-                if (f === '__typename') return
-                if (!Post.publicFields.includes(f)) errors.push(f)
-              })
-              if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')}`)
-            }
-
-            return findOptions
-          }
-        })
+        resolve: authResolver(Post)
       }
     }
   })

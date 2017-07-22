@@ -70,4 +70,26 @@ describe('Post routes', () => {
         expect(res.status).to.equal(200)
       })
   })
+
+  it('should return the username when requested', () => {
+    const query = `{
+        posts {
+          id
+          slug
+          title
+          author {
+            username
+          }
+        }
+      }`
+    return request
+      .post('/graphql')
+      .send({ operationName: null, query, variables: null })
+      .then((res) => {
+        expect(res.body.data.posts).to.be.an('array')
+        expect(res.body.data.posts[0]).to.have.any.keys('author')
+        expect(res.body.data.posts[0].author).to.have.any.keys('username')
+        expect(res.status).to.equal(200)
+      })
+  })
 })

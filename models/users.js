@@ -65,6 +65,11 @@ module.exports = function (sequelize, DataTypes) {
     }, {})
   }
 
+  User.publicFields = [
+    'username',
+    'slug'
+  ]
+
   return User
 }
 

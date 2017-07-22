@@ -26,6 +26,9 @@ Object.keys(db).forEach(function (modelName) {
   }
 })
 
+db.Post.User = db.Post.belongsTo(db.User)
+db.User.Post = db.User.hasMany(db.Post)
+
 db.sequelize = sequelize
 db.Sequelize = Sequelize
 
