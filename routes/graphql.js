@@ -27,6 +27,7 @@ const schema = new GraphQLSchema({
               const fields = sections.map(selection => selection.name.value)
               const errors = []
               fields.forEach(f => {
+                if (f === '__typename') return
                 if (!Post.publicFields.includes(f)) errors.push(f)
               })
               if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')}`)

@@ -21,6 +21,7 @@ describe('Post routes', () => {
           id
           slug
           title
+          __typename
         }
       }`
     return request
