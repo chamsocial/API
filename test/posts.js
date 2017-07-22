@@ -9,9 +9,11 @@ const factory = require('./helpers/factory')
 const request = supertest.agent(app.listen())
 
 describe('Post routes', () => {
+  let post
   beforeEach(() => {
     return setup.initDB()
       .then(() => factory.create('Post'))
+      .then(createdPost => (post = createdPost))
   })
   afterEach(() => setup.destroyDB())
 
@@ -91,5 +93,31 @@ describe('Post routes', () => {
         expect(res.body.data.posts[0].author).to.have.any.keys('username')
         expect(res.status).to.equal(200)
       })
+  })
+
+  describe('Single', () => {
+    it('should respond with a post', () => {
+      const token = setup.jwtToken()
+      const query = `query postSingle($slug: String!) {
+          post (slug: $slug) {
+            id
+            slug
+            content
+            title
+          }
+        }`
+      return request
+        .post('/graphql')
+        .send({ operationName: null, query, variables: { slug: post.slug } })
+        .set('Authorization', `bearer ${token}`)
+        .then((res) => {
+          expect(res.body.data.post).to.have.all.keys('id', 'slug', 'content', 'title')
+          expect(res.body.data.post.title).to.equal(post.title)
+          expect(res.body.data.post.slug).to.equal(post.slug)
+          expect(res.body.data.post.content).to.equal(post.content)
+          expect(res.body.data.post.id).to.equal(post.id)
+          expect(res.status).to.equal(200)
+        })
+    })
   })
 })

@@ -1,7 +1,7 @@
 const router = require('koa-router')()
 const { graphqlKoa, graphiqlKoa } = require('graphql-server-koa')
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
-const { GraphQLObjectType, GraphQLList, GraphQLSchema } = require('graphql')
+const { GraphQLObjectType, GraphQLList, GraphQLSchema, GraphQLString, GraphQLNonNull } = require('graphql')
 const { decodeJwt } = require('./middleware')
 const { Post, User } = require('../models')
 const assign = require('lodash.assign')
@@ -59,6 +59,13 @@ const schema = new GraphQLSchema({
       posts: {
         type: new GraphQLList(types.post),
         args: defaultListArgs(),
+        resolve: authResolver(Post)
+      },
+      post: {
+        type: types.post,
+        args: {
+          slug: { type: new GraphQLNonNull(GraphQLString) }
+        },
         resolve: authResolver(Post)
       }
     }
