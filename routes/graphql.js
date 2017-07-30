@@ -46,7 +46,7 @@ const types = {
         resolve: resolver(Post.Comment, {
           before (findOptions) {
             if (!findOptions.where) findOptions.where = {}
-            findOptions.where.parent_id = null
+            findOptions.where.$or = [{ parent_id: 0 }, { parent_id: null }]
 
             if (!findOptions.order) {
               findOptions.order = [ [ 'created_at', 'ASC' ] ]
@@ -123,6 +123,25 @@ const schema = new GraphQLSchema({
       postsInfo: {
         type: types.postsInfo,
         resolve: () => ({})
+      }
+    }
+  }),
+  mutation: new GraphQLObjectType({
+    name: 'Mutations',
+    fields: {
+      createComment: {
+        type: types.comment,
+        description: 'Create a comment',
+        args: {
+          postId: { type: new GraphQLNonNull(GraphQLInt) },
+          comment: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        resolve: (_, {postId, comment}, { userToken }) => {
+          if (!userToken || userToken === undefined) {
+            throw new Error('Must be logged in')
+          }
+          return Comment.create({ post_id: postId, content: comment, user_id: userToken.id })
+        }
       }
     }
   })
