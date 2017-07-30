@@ -3,7 +3,7 @@ const { graphqlKoa, graphiqlKoa } = require('graphql-server-koa')
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
 const { GraphQLObjectType, GraphQLList, GraphQLSchema, GraphQLString, GraphQLNonNull, GraphQLInt } = require('graphql')
 const { decodeJwt } = require('./middleware')
-const { Post, User } = require('../models')
+const { Post, User, Comment } = require('../models')
 const assign = require('lodash.assign')
 
 const defaultModelArgs = defaultListArgs()
@@ -39,6 +39,22 @@ const types = {
         type: types.user,
         args: defaultModelArgs,
         resolve: resolver(Post.User)
+      },
+      comments: {
+        type: new GraphQLList(types.comment),
+        args: defaultModelArgs,
+        resolve: resolver(Post.Comment, {
+          before (findOptions) {
+            if (!findOptions.where) findOptions.where = {}
+            findOptions.where.parent_id = null
+
+            if (!findOptions.order) {
+              findOptions.order = [ [ 'created_at', 'ASC' ] ]
+            }
+
+            return findOptions
+          }
+        })
       }
     })
   }),
@@ -60,6 +76,29 @@ const types = {
         type: new GraphQLList(types.post),
         args: defaultModelArgs,
         resolve: authResolver(User.Post)
+      }
+    })
+  }),
+  comment: new GraphQLObjectType({
+    name: 'Comment',
+    description: 'A comment',
+    fields: () => assign(attributeFields(Comment), {
+      author: {
+        type: types.user,
+        args: defaultModelArgs,
+        resolve: resolver(Comment.User)
+      },
+      comments: {
+        type: new GraphQLList(types.comment),
+        args: defaultModelArgs,
+        resolve: resolver(Comment.Comment, {
+          before (findOptions) {
+            if (!findOptions.order) {
+              findOptions.order = [ [ 'created_at', 'ASC' ] ]
+            }
+            return findOptions
+          }
+        })
       }
     })
   })

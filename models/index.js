@@ -29,6 +29,14 @@ Object.keys(db).forEach(function (modelName) {
 db.Post.User = db.Post.belongsTo(db.User)
 db.User.Post = db.User.hasMany(db.Post)
 
+db.Post.Comment = db.Post.hasMany(db.Comment)
+db.Comment.Post = db.Comment.belongsTo(db.Post)
+
+db.User.Comment = db.User.hasMany(db.Comment)
+db.Comment.User = db.Comment.belongsTo(db.User)
+
+db.Comment.Comment = db.Comment.hasMany(db.Comment, { foreignKey: 'parent_id' })
+
 db.sequelize = sequelize
 db.Sequelize = Sequelize
 
