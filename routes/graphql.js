@@ -19,7 +19,10 @@ function authResolver (Model) {
           if (f === '__typename') return
           if (!Model.publicFields.includes(f)) errors.push(f)
         })
-        if (errors.length) throw new Error(`Must be logged in to access ${errors.join(', ')} on ${Model.name}`)
+        if (errors.length) {
+          context.ctx.status = 401
+          throw new Error(`Must be logged in to access ${errors.join(', ')} on ${Model.name}`)
+        }
       }
 
       return findOptions
@@ -74,7 +77,7 @@ const schema = new GraphQLSchema({
 
 router.post('/graphql', decodeJwt, graphqlKoa(ctx => ({
   schema,
-  context: { userToken: ctx.userToken }
+  context: { userToken: ctx.userToken, ctx }
 })))
 
 router.get('/graphiql', graphiqlKoa({ endpointURL: '/graphql' }))
