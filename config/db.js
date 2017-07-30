@@ -5,7 +5,8 @@ module.exports = {
     'database': process.env.MYSQL_DATABASE || 'chamsocial',
     'host': process.env.MYSQL_HOST || '127.0.0.1',
     'port': process.env.MYSQL_PORT || 3306,
-    'dialect': 'mysql'
+    'dialect': 'mysql',
+    logging: process.env.SQL_LOGGING ? console.log : false
   },
   test: {
     database: 'cham_test_db',
