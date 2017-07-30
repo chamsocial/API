@@ -38,7 +38,7 @@ const types = {
       author: {
         type: types.user,
         args: defaultModelArgs,
-        resolve: authResolver(User)
+        resolve: resolver(Post.User)
       }
     })
   }),
@@ -59,7 +59,7 @@ const types = {
       posts: {
         type: new GraphQLList(types.post),
         args: defaultModelArgs,
-        resolve: authResolver(Post)
+        resolve: authResolver(User.Post)
       }
     })
   })
