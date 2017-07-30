@@ -8,8 +8,8 @@ const assign = require('lodash.assign')
 
 const defaultModelArgs = defaultListArgs()
 
-function authResolver (Model) {
-  return resolver(Model, {
+function authResolver (Model, resolverOptions) {
+  return resolver(Model, Object.assign({
     before (findOptions, args, context, info) {
       if (!context.userToken || context.userToken === undefined) {
         const sections = info.fieldNodes[0].selectionSet.selections
@@ -27,7 +27,7 @@ function authResolver (Model) {
 
       return findOptions
     }
-  })
+  }, resolverOptions))
 }
 
 const types = {

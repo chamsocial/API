@@ -1,3 +1,6 @@
+const showdown = require('showdown')
+const converter = new showdown.Converter()
+
 module.exports = function (sequelize, DataTypes) {
   const Post = sequelize.define('Post', {
     user_id: {
@@ -22,7 +25,14 @@ module.exports = function (sequelize, DataTypes) {
     email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     title: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
-    content: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' }
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '',
+      get () {
+        return converter.makeHtml(this.getDataValue('content'))
+      }
+    }
   }, {
     tableName: 'posts',
     underscored: true,
