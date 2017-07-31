@@ -143,6 +143,11 @@ const schema = new GraphQLSchema({
           return Post.findOne({ where: { slug: postSlug } })
             .then(post => {
               return Comment.create({ post_id: post.id, content: comment, user_id: userToken.id })
+                .then(comment => {
+                  post.comments_count++
+                  return post.save()
+                    .then(() => comment)
+                })
             })
         }
       }
