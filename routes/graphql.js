@@ -133,14 +133,17 @@ const schema = new GraphQLSchema({
         type: types.comment,
         description: 'Create a comment',
         args: {
-          postId: { type: new GraphQLNonNull(GraphQLInt) },
+          postSlug: { type: new GraphQLNonNull(GraphQLString) },
           comment: { type: new GraphQLNonNull(GraphQLString) }
         },
-        resolve: (_, {postId, comment}, { userToken }) => {
+        resolve: (_, {postSlug, comment}, { userToken }) => {
           if (!userToken || userToken === undefined) {
             throw new Error('Must be logged in')
           }
-          return Comment.create({ post_id: postId, content: comment, user_id: userToken.id })
+          return Post.findOne({ where: { slug: postSlug } })
+            .then(post => {
+              return Comment.create({ post_id: post.id, content: comment, user_id: userToken.id })
+            })
         }
       }
     }
