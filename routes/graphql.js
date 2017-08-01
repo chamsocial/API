@@ -134,21 +134,31 @@ const schema = new GraphQLSchema({
         description: 'Create a comment',
         args: {
           postSlug: { type: new GraphQLNonNull(GraphQLString) },
-          comment: { type: new GraphQLNonNull(GraphQLString) }
+          comment: { type: new GraphQLNonNull(GraphQLString) },
+          parentId: { type: GraphQLInt }
         },
-        resolve: (_, {postSlug, comment}, { userToken }) => {
+        resolve: async (_, {postSlug, comment, parentId}, { userToken }) => {
+          let newComment
           if (!userToken || userToken === undefined) {
             throw new Error('Must be logged in')
           }
-          return Post.findOne({ where: { slug: postSlug } })
-            .then(post => {
-              return Comment.create({ post_id: post.id, content: comment, user_id: userToken.id })
-                .then(comment => {
-                  post.comments_count++
-                  return post.save()
-                    .then(() => comment)
-                })
+
+          try {
+            const post = await Post.findOne({ where: { slug: postSlug } })
+            newComment = await Comment.create({
+              post_id: post.id,
+              content: comment,
+              user_id: userToken.id,
+              parent_id: parentId
             })
+            post.comments_count++
+            await post.save()
+          } catch (e) {
+            console.log('SAVE_COMMENT', { user_id: userToken.id, postSlug }, e)
+            throw new Error('Could not save comment')
+          }
+
+          return newComment
         }
       }
     }
