@@ -1,8 +1,9 @@
-require('dotenv').config()
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '../.env' })
+                          
 const Koa = require('koa')
 const app = new Koa()
 const cors = require('kcors')
-const path = require('path')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
