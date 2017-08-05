@@ -1,12 +1,13 @@
 'use strict'
 
-var fs = require('fs')
-var path = require('path')
-var Sequelize = require('sequelize')
-var basename = path.basename(module.filename)
-var env = process.env.NODE_ENV || 'development'
-var config = require('../config/db.js')[env]
-var db = {}
+const fs = require('fs')
+const path = require('path')
+const Sequelize = require('sequelize')
+const basename = path.basename(module.filename)
+const env = process.env.NODE_ENV || 'development'
+const config = require('../config/db.js')[env]
+const redisClient = require('../config/redis')
+const db = {}
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
 
@@ -16,7 +17,7 @@ fs
     return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js')
   })
   .forEach(function (file) {
-    var model = sequelize['import'](path.join(__dirname, file))
+    const model = sequelize['import'](path.join(__dirname, file))
     db[model.name] = model
   })
 
@@ -36,6 +37,25 @@ db.User.Comment = db.User.hasMany(db.Comment)
 db.Comment.User = db.Comment.belongsTo(db.User)
 
 db.Comment.Comment = db.Comment.hasMany(db.Comment, { foreignKey: 'parent_id' })
+
+// Trigger emails
+
+db.Comment.hook('afterCreate', (comment, options) => {
+  triggerEmail('comment', comment.id)
+})
+db.Post.hook('afterCreate', (post, options) => {
+  if (post.status === 'published') {
+    triggerEmail('post', post.id)
+  }
+})
+db.Post.hook('afterUpdate', (post, options) => {
+  if (options.fields.includes('status') && post.status === 'published') {
+    triggerEmail('post', post.id)
+  }
+})
+function triggerEmail (type, id) {
+  redisClient.publish('send_email', JSON.stringify({ command: type, params: { id } }))
+}
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
