@@ -4,6 +4,7 @@ const { attributeFields, defaultListArgs, resolver } = require('graphql-sequeliz
 const { GraphQLObjectType, GraphQLList, GraphQLSchema, GraphQLString, GraphQLNonNull, GraphQLInt } = require('graphql')
 const { decodeJwt } = require('./middleware')
 const { Post, User, Comment } = require('../models')
+const createUser = require('../mutators/createUser')
 const assign = require('lodash.assign')
 
 const defaultModelArgs = defaultListArgs()
@@ -160,10 +161,29 @@ const schema = new GraphQLSchema({
 
           return newComment
         }
+      },
+      createUser: {
+        type: types.user,
+        description: 'Create a new user',
+        args: {
+          username: { type: new GraphQLNonNull(GraphQLString) },
+          email: { type: new GraphQLNonNull(GraphQLString) },
+          password: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        resolve: (_, {username, email, password}, { ctx }) => {
+          return createUser({ username, email, password }, ctx.request.ip)
+            .catch(validationErrors)
+        }
       }
     }
   })
 })
+
+function validationErrors (e) {
+  if (!e.errors) return e
+  const errors = e.errors.map(error => error.message)
+  return new Error(`Validation: ${errors.join(', ')}`)
+}
 
 router.post('/graphql', decodeJwt, graphqlKoa(ctx => ({
   schema,
