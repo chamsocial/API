@@ -24,7 +24,7 @@ function generateActivationCode () {
 }
 
 function sendEmail (user, activationCode) {
-  const url = `${process.env.HOME_URL}/users/activate/${activationCode}`
+  const url = `${process.env.HOME_URL}/user/activate/${activationCode}`
 
   // Send an activation email
   const data = {

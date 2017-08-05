@@ -38,6 +38,8 @@ db.Comment.User = db.Comment.belongsTo(db.User)
 
 db.Comment.Comment = db.Comment.hasMany(db.Comment, { foreignKey: 'parent_id' })
 
+db.Activation.User = db.Activation.belongsTo(db.User)
+
 // Trigger emails
 
 db.Comment.hook('afterCreate', (comment, options) => {

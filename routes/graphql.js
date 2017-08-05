@@ -3,8 +3,9 @@ const { graphqlKoa, graphiqlKoa } = require('graphql-server-koa')
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
 const { GraphQLObjectType, GraphQLList, GraphQLSchema, GraphQLString, GraphQLNonNull, GraphQLInt } = require('graphql')
 const { decodeJwt } = require('./middleware')
-const { Post, User, Comment } = require('../models')
+const { Post, User, Comment, Activation } = require('../models')
 const createUser = require('../mutators/createUser')
+const authUtils = require('../utils/auth')
 const assign = require('lodash.assign')
 
 const defaultModelArgs = defaultListArgs()
@@ -102,6 +103,21 @@ const types = {
         })
       }
     })
+  }),
+  activation: new GraphQLObjectType({
+    name: 'Activation',
+    description: 'Activate a user',
+    fields: () => ({
+      user: {
+        type: types.user,
+        args: defaultModelArgs,
+        resolve: (mutationData) => mutationData.user
+      },
+      token: {
+        type: GraphQLString,
+        resolve: (mutationData) => mutationData.token
+      }
+    })
   })
 }
 
@@ -173,6 +189,34 @@ const schema = new GraphQLSchema({
         resolve: (_, {username, email, password}, { ctx }) => {
           return createUser({ username, email, password }, ctx.request.ip)
             .catch(validationErrors)
+        }
+      },
+      activateUser: {
+        type: types.activation,
+        args: {
+          code: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        resolve: (_, { code }, { ctx }) => {
+          return Activation.findOne({ where: { code, verified_at: null } })
+            .then(activation => {
+              if (!activation) throw new Error('No code activation found')
+              activation.verified_ip = ctx.request.ip
+              activation.verified_at = new Date()
+              return activation.save()
+            })
+            .then(activation => {
+              return User.findOne({ where: { id: activation.user_id } })
+            })
+            .then(user => {
+              user.activated = 1
+              return user.save()
+            })
+            .then(user => {
+              return {
+                user: user,
+                token: authUtils.generateJWT(user)
+              }
+            })
         }
       }
     }
