@@ -140,6 +140,13 @@ const schema = new GraphQLSchema({
       postsInfo: {
         type: types.postsInfo,
         resolve: () => ({})
+      },
+      user: {
+        type: types.user,
+        args: {
+          slug: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        resolve: authResolver(User)
       }
     }
   }),
