@@ -9,9 +9,13 @@ async function decodeJwt (ctx, next) {
   }
 
   const token = authorization.split(' ').pop()
-  if (!token) ctx.throw(new Error('Token is missing'))
-
-  ctx.userToken = await jwt.verify(token, JWT_SECRET)
+  try {
+    ctx.userToken = await jwt.verify(token, JWT_SECRET)
+  } catch (e) {
+    const error = new Error('Invalid or expired token')
+    error.status = 401
+    ctx.throw(error)
+  }
   await next()
 }
 
