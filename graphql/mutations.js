@@ -79,6 +79,24 @@ const mutations = new GraphQLObjectType({
             }
           })
       }
+    },
+    updateUser: {
+      type: types.user,
+      description: 'Update a new user',
+      args: {
+        slug: { type: new GraphQLNonNull(GraphQLString) },
+        first_name: { type: GraphQLString },
+        last_name: { type: GraphQLString },
+        interests: { type: GraphQLString },
+        aboutme: { type: GraphQLString },
+        jobtitle: { type: GraphQLString },
+        lang: { type: GraphQLString }
+      },
+      resolve: (_, data, { userToken }) => {
+        const { slug } = data
+        if (userToken.slug !== slug) throw new Error('Not allowed')
+        return User.findOne({ where: { slug: slug } })
+      }
     }
   }
 })
