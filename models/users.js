@@ -74,7 +74,7 @@ module.exports = function (sequelize, DataTypes) {
     deletedAt: false
   })
 
-  User.hook('beforeValidate', async function setSlug (user, options) {
+  User.hook('beforeCreate', async function setSlug (user, options) {
     const slug = await generateSlug(this, user.username)
     user.slug = slug
     return user
