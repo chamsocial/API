@@ -7,6 +7,6 @@ function graphqlFile(file) {
 
 const types = graphqlFile('types')
 const queries = graphqlFile('queries')
-// const mutations = graphqlFile('mutations')
+const mutations = graphqlFile('mutations')
 
-module.exports = [types, queries]
+module.exports = [types, queries, mutations]

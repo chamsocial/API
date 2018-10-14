@@ -1,13 +1,14 @@
-'use strict'
-
 const fs = require('fs')
 const path = require('path')
 const Sequelize = require('sequelize')
+
 const basename = path.basename(module.filename)
 const env = process.env.NODE_ENV || 'development'
 const config = require('../config/db.js')[env]
 const redisClient = require('../config/redis')
+
 const db = {}
+config.operatorsAliases = false
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
 
@@ -61,5 +62,6 @@ function triggerEmail (type, id) {
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
+db.Op = Sequelize.Op
 
 module.exports = db
