@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const slug = require('slug')
 
@@ -61,7 +62,7 @@ module.exports = function userDefinition(sequelize, DataTypes) {
       defaultValue: '',
       validate: {
         len: {
-          msg: 'The password needs to be at least 3 characters',
+          msg: 'The password needs to be at least 6 characters',
           args: [6, 240],
         },
       },
@@ -98,7 +99,21 @@ module.exports = function userDefinition(sequelize, DataTypes) {
   User.hook('beforeUpdate', hashPassword)
 
   User.prototype.validPassword = function validPassword(password) {
-    return bcrypt.compare(password, this.password)
+    return bcrypt
+      .compare(password, this.password)
+      .then(isCorrect => {
+        if (isCorrect) return true
+        return this.checkLegacyMd5(password)
+      })
+  }
+
+  User.prototype.checkLegacyMd5 = function checkLegacyMd5(password) {
+    const md5 = crypto.createHash('md5')
+    md5.update(password)
+    if (md5.digest('hex') !== this.password) return false
+
+    this.password = password
+    return this.save()
   }
 
   User.prototype.hasActivated = function hasActivated() {

@@ -7,7 +7,7 @@ function invalidUserError(title = 'Invalid username or password') {
 }
 
 const mutations = {
-  async login(_, { username, password }) {
+  async login(_, { username, password }, { ctx }) {
     if (!username || !password) throw invalidUserError()
 
     const user = await User.findOne({ where: { [Op.or]: [{ username }, { email: username }] } })
@@ -20,7 +20,7 @@ const mutations = {
     if (!validPassword) throw invalidUserError()
 
     await user.updateAttributes({ last_login: new Date() })
-
+    ctx.session.user = user.id
     return user.getPublicData()
   },
 }

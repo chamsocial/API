@@ -8,6 +8,7 @@ const typeDefs = require('./typeDefs')
 const server = new ApolloServer({
   resolvers,
   typeDefs,
+  context: ({ ctx }) => ({ ctx }),
 })
 
 module.exports = app => server.applyMiddleware({
