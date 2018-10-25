@@ -32,18 +32,17 @@ app.use(session(SESSION_CONFIG, app))
 onerror(app)
 
 process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason)
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason) // eslint-disable-line
   // application specific logging, throwing an error, or other logic here
 })
 
 // middlewares
 app.use(bodyparser({ enableTypes: ['json', 'form', 'text'] }))
 app.use(json())
-app.use(cors({
-  credentials: true,
-}))
 if (process.env.NODE_ENV !== 'test') app.use(logger())
 app.use(staticFiles(path.join(__dirname, '/public')))
+
+app.use(cors({ credentials: true }))
 
 app.use(middleware.setUser)
 
