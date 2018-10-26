@@ -98,13 +98,10 @@ module.exports = function userDefinition(sequelize, DataTypes) {
   User.hook('beforeCreate', hashPassword)
   User.hook('beforeUpdate', hashPassword)
 
-  User.prototype.validPassword = function validPassword(password) {
-    return bcrypt
-      .compare(password, this.password)
-      .then(isCorrect => {
-        if (isCorrect) return true
-        return this.checkLegacyMd5(password)
-      })
+  User.prototype.validPassword = async function validPassword(password) {
+    const isCorrect = bcrypt.compare(password, this.password)
+    if (isCorrect) return true
+    return this.checkLegacyMd5(password)
   }
 
   User.prototype.checkLegacyMd5 = function checkLegacyMd5(password) {
