@@ -11,8 +11,8 @@ type Post {
   title: String!
   slug: String!
   content: String
-  created_at: DateTime
-  comments_count: Int
+  createdAt: DateTime
+  commentsCount: Int
   author: User
   comments: [Comment]!
 }

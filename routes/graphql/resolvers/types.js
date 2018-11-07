@@ -4,6 +4,8 @@ const { User, Comment } = require('../../../models')
 const types = {
   DateTime: GraphQLDateTime,
   Post: {
+    createdAt: post => post.created_at,
+    commentsCount: post => post.comments_count,
     author: post => User.findById(post.user_id),
     comments: post => Comment.findAll({ where: { post_id: post.id }, limit: 500 }),
   },
