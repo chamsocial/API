@@ -91,12 +91,12 @@ module.exports = function userDefinition(sequelize, DataTypes) {
     deletedAt: false,
   })
 
-  User.hook('beforeCreate', async function setSlug(user) {
+  User.addHook('beforeCreate', async function setSlug(user) {
     const generatedSlug = await generateSlug(this, user.username)
     return { ...user, slug: generatedSlug }
   })
-  User.hook('beforeCreate', hashPassword)
-  User.hook('beforeUpdate', hashPassword)
+  User.addHook('beforeCreate', hashPassword)
+  User.addHook('beforeUpdate', hashPassword)
 
   User.prototype.validPassword = async function validPassword(password) {
     const isCorrect = bcrypt.compare(password, this.password)
