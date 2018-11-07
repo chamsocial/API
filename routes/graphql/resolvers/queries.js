@@ -11,6 +11,7 @@ const queries = {
   postsInfo: async () => ({
     count: await Post.count(),
   }),
+  post: (_, { slug }) => Post.findOne({ where: { slug } }),
 }
 
 module.exports = queries
