@@ -1,3 +1,5 @@
 type Query {
   me: User
+  posts(limit: Int page: Int): [Post]!
+  postsInfo: postsInfoType!
 }

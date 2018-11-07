@@ -1,4 +1,20 @@
+scalar DateTime
+
 type User {
   id: ID!
+  slug: String!
   username: String
 }
+
+type Post {
+  id: ID!
+  title: String!
+  slug: String!
+  created_at: DateTime
+  comments_count: Int
+  author: User
+}
+type postsInfoType {
+  count: Int!
+}
+
