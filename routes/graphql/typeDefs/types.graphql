@@ -3,6 +3,7 @@ scalar DateTime
 type User {
   id: ID!
   slug: String!
+  email: String
   username: String
 }
 

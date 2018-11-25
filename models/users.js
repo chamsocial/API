@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const slug = require('slug')
@@ -13,8 +14,8 @@ async function generateSlug(User, username, i = '') {
   let userSlug = slug(username + i, { lower: true }).substr(0, 240)
   const slugExist = await User.findOne({ where: { slug: userSlug } })
   if (slugExist) {
-    if (!i) i = 0
-    userSlug = await generateSlug(User, username, ++i)
+    i = i ? (i + 1) : 0
+    userSlug = await generateSlug(User, username, i)
   }
   return userSlug
 }
@@ -30,12 +31,6 @@ module.exports = function userDefinition(sequelize, DataTypes) {
           msg: 'The username needs to be at least 3 characters',
           args: [3, 240],
         },
-        isUnique(value) {
-          return User.findOne({ where: { username: value } })
-            .then(email => {
-              if (email) throw new Error('The username is already taken')
-            })
-        },
       },
     },
     email: {
@@ -45,12 +40,6 @@ module.exports = function userDefinition(sequelize, DataTypes) {
       validate: {
         isEmail: {
           msg: 'You need to provide a valid email',
-        },
-        isUnique(value) {
-          return User.findOne({ where: { email: value } })
-            .then(email => {
-              if (email) throw new Error('The email is already registred')
-            })
         },
       },
     },
@@ -77,7 +66,9 @@ module.exports = function userDefinition(sequelize, DataTypes) {
     interests: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     aboutme: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     jobtitle: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
-    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+    slug: {
+      type: DataTypes.STRING, allowNull: false, defaultValue: '', unique: true,
+    },
     lang: { type: DataTypes.STRING, allowNull: false, defaultValue: 'en' },
     role: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: 0 },
@@ -93,7 +84,7 @@ module.exports = function userDefinition(sequelize, DataTypes) {
 
   User.addHook('beforeCreate', async function setSlug(user) {
     const generatedSlug = await generateSlug(this, user.username)
-    return { ...user, slug: generatedSlug }
+    user.slug = generatedSlug
   })
   User.addHook('beforeCreate', hashPassword)
   User.addHook('beforeUpdate', hashPassword)
