@@ -1,4 +1,5 @@
 type Mutation {
   login(username: String! password: String!): User
   createUser(username: String! email: String! password: String!): User
+  activateUser(code: String!): User
 }

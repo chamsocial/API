@@ -6,6 +6,10 @@ const server = new ApolloServer({
   resolvers,
   typeDefs,
   context: ({ ctx }) => ({ ctx, me: ctx.user }),
+  formatError: error => {
+    console.log('GraphQL error:', error)
+    return error
+  },
 })
 
 module.exports = app => server.applyMiddleware({

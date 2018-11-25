@@ -1,5 +1,7 @@
 const { UserInputError } = require('apollo-server-koa')
-const { User, Op, sequelize } = require('../../../models')
+const {
+  Activation, User, Op, sequelize,
+} = require('../../../models')
 const createUser = require('../../../mutators/createUser')
 
 function invalidUserError(title = 'Invalid username or password') {
@@ -35,6 +37,18 @@ const mutations = {
         // @TODO Log
         throw new Error('A server error occured please try again later.')
       })
+  },
+  async activateUser(_, { code }, { ctx }) {
+    const activation = await Activation.findOne({ where: { code, verified_at: null } })
+    if (!activation) throw new Error('No code activation found')
+    activation.verified_ip = ctx.request.ip
+    activation.verified_at = new Date()
+    await activation.save()
+
+    const user = await User.findOne({ where: { id: activation.user_id } })
+    await user.update({ last_login: new Date(), activated: 1 })
+    ctx.session.user = user.id
+    return user.getPublicData()
   },
 }
 
