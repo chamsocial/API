@@ -1,4 +1,4 @@
-const { UserInputError } = require('apollo-server-koa')
+const { UserInputError, AuthenticationError } = require('apollo-server-koa')
 const {
   Activation, User, Op, sequelize,
 } = require('../../../models')
@@ -49,6 +49,20 @@ const mutations = {
     await user.update({ last_login: new Date(), activated: 1 })
     ctx.session.user = user.id
     return user.getPublicData()
+  },
+  async updateUser(_, { slug, ...fields }, { me }) {
+    if (!me || me.slug !== slug) throw new AuthenticationError('You are not authorized to edit this profile.')
+
+    const user = await User.findByPk(me.id)
+    user.first_name = fields.firstName
+    user.last_name = fields.lastName
+    user.company_name = fields.companyName
+    user.jobtitle = fields.jobtitle
+    user.interests = fields.interests
+    user.aboutme = fields.aboutme
+    user.lang = fields.lang
+    await user.save()
+    return user
   },
 }
 

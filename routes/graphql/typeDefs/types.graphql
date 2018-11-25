@@ -1,5 +1,8 @@
 scalar DateTime
-
+enum Lang {
+  en
+  fr
+}
 type User {
   id: ID!
   slug: String!
@@ -12,6 +15,7 @@ type User {
   aboutme: String
   jobtitle: String
   avatarUrl: String
+  lang: Lang
   posts: [Post]
 }
 
