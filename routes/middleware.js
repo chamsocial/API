@@ -10,7 +10,7 @@ function isAuthorized(ctx, next) {
 
 const setUser = async (ctx, next) => {
   if (!ctx.session.user) return next()
-  ctx.user = await User.findById(ctx.session.user)
+  ctx.user = await User.findByPk(ctx.session.user)
   return next()
 }
 

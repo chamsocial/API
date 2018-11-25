@@ -6,11 +6,11 @@ const types = {
   Post: {
     createdAt: post => post.created_at,
     commentsCount: post => post.comments_count,
-    author: post => User.findById(post.user_id),
+    author: post => User.findByPk(post.user_id),
     comments: post => Comment.findAll({ where: { post_id: post.id }, limit: 500 }),
   },
   Comment: {
-    author: comment => User.findById(comment.user_id),
+    author: comment => User.findByPk(comment.user_id),
     comments: comment => Comment.findAll({ where: { parent_id: comment.id }, limit: 500 }),
   },
 }

@@ -102,7 +102,7 @@ describe('Login', () => {
       .post('/v2/login')
       .send({ username: user.username, password: user.password })
       .then(async (res) => {
-        const loggedInUser = await User.findById(dbUser.id)
+        const loggedInUser = await User.findByPk(dbUser.id)
         expect(loggedInUser.last_login).to.not.be.undefined // eslint-disable-line no-unused-expressions
       })
   })
