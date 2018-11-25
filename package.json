@@ -21,6 +21,7 @@
     "graphql-relay": "^0.5.2",
     "graphql-sequelize": "^9.0.4",
     "graphql-server-koa": "^1.0.0",
+    "gravatar": "^1.7.0",
     "jsonwebtoken": "^8.3.0",
     "kcors": "^2.2.1",
     "koa": "^2.2.0",

@@ -5,6 +5,14 @@ type User {
   slug: String!
   email: String
   username: String
+  firstName: String
+  lastName: String
+  companyName: String
+  interests: String
+  aboutme: String
+  jobtitle: String
+  avatarUrl: String
+  posts: [Post]
 }
 
 type Post {

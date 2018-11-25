@@ -3,4 +3,5 @@ type Query {
   posts(limit: Int page: Int): [Post]!
   postsInfo: postsInfoType!
   post(slug: String!): Post
+  user(slug: String!): User
 }

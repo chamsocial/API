@@ -1,4 +1,4 @@
-const { Post } = require('../../../models')
+const { Post, User } = require('../../../models')
 
 const queries = {
   me: (_, args, { me }) => me,
@@ -12,6 +12,7 @@ const queries = {
     count: await Post.count(),
   }),
   post: (_, { slug }) => Post.findOne({ where: { slug } }),
+  user: (_, { slug }) => User.findOne({ where: { slug } }),
 }
 
 module.exports = queries
