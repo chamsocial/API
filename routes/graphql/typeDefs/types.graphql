@@ -35,9 +35,9 @@ type postsInfoType {
 
 type Comment {
   id: ID!
-  created_at: DateTime
+  createdAt: DateTime
   content: String
-  parent_id: Int
+  parentId: Int
   author: User
   comments: [Comment]
 }

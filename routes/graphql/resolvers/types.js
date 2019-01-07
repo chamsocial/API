@@ -11,6 +11,8 @@ const types = {
     comments: post => Comment.findAll({ where: { post_id: post.id }, limit: 500 }),
   },
   Comment: {
+    createdAt: comment => comment.created_at,
+    parentId: comment => comment.parent_id,
     author: comment => User.findByPk(comment.user_id),
     comments: comment => Comment.findAll({ where: { parent_id: comment.id }, limit: 500 }),
   },

@@ -7,4 +7,9 @@ type Mutation {
     jobtitle: String lang: Lang interests: String
     aboutme: String companyName: String
   ): User
+  createComment(
+    postSlug: String!
+    comment: String!
+    parentId: Int
+  ): Comment
 }

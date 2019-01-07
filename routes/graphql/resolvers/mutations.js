@@ -1,6 +1,7 @@
 const { UserInputError, AuthenticationError } = require('apollo-server-koa')
 const {
-  Activation, User, Op, sequelize,
+  Activation, User, Post, Comment,
+  Op, sequelize,
 } = require('../../../models')
 const createUser = require('../../../mutators/createUser')
 
@@ -27,6 +28,7 @@ const mutations = {
     ctx.session.user = user.id
     return user.getPublicData()
   },
+
   async createUser(_, { username, email, password }, { ctx }) {
     return createUser({ username, email, password }, ctx.request.ip)
       .catch(err => {
@@ -38,6 +40,7 @@ const mutations = {
         throw new Error('A server error occured please try again later.')
       })
   },
+
   async activateUser(_, { code }, { ctx }) {
     const activation = await Activation.findOne({ where: { code, verified_at: null } })
     if (!activation) throw new Error('No code activation found')
@@ -50,6 +53,7 @@ const mutations = {
     ctx.session.user = user.id
     return user.getPublicData()
   },
+
   async updateUser(_, { slug, ...fields }, { me }) {
     if (!me || me.slug !== slug) throw new AuthenticationError('You are not authorized to edit this profile.')
 
@@ -63,6 +67,29 @@ const mutations = {
     user.lang = fields.lang
     await user.save()
     return user
+  },
+
+  async createComment(_, { postSlug, comment, parentId }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (comment.length < 3) throw new UserInputError('Comment error', { errors: [{ message: 'To short' }] })
+    let newComment
+
+    try {
+      const post = await Post.findOne({ where: { slug: postSlug } })
+      newComment = await Comment.create({
+        post_id: post.id,
+        content: comment,
+        user_id: me.id,
+        parent_id: parentId,
+      })
+      post.comments_count += 1
+      await post.save()
+    } catch (e) {
+      console.error('SAVE_COMMENT', { user_id: me.id, postSlug }, e)
+      throw new Error('Could not save comment')
+    }
+
+    return newComment
   },
 }
 
