@@ -11,7 +11,13 @@ const queries = {
   postsInfo: async () => ({
     count: await Post.count(),
   }),
-  post: (_, { slug }) => Post.findOne({ where: { slug } }),
+  post: (_, { slug }) => (
+    Post.findOne({ where: { slug } })
+      .then(post => {
+        if (!post) throw new Error('No post found!')
+        return post
+      })
+  ),
   user: (_, { slug }) => User.findOne({ where: { slug } }),
 }
 
