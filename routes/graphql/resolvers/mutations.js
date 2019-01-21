@@ -24,7 +24,7 @@ const mutations = {
     const validPassword = await user.validPassword(password)
     if (!validPassword) throw invalidUserError()
 
-    await user.updateAttributes({ last_login: new Date() })
+    await user.update({ last_login: new Date() })
     ctx.session.user = user.id
     return user.getPublicData()
   },
@@ -90,6 +90,12 @@ const mutations = {
     }
 
     return newComment
+  },
+  async createPost(_, { title, status }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    console.log(title, status)
+    return null
   },
 }
 

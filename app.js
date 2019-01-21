@@ -7,7 +7,7 @@ const session = require('koa-session')
 const cors = require('kcors')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
-const bodyparser = require('koa-bodyparser')
+const bodyparser = require('koa-body')
 const logger = require('koa-logger')
 const staticFiles = require('koa-static')
 
@@ -37,7 +37,7 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 // middlewares
-app.use(bodyparser({ enableTypes: ['json', 'form', 'text'] }))
+app.use(bodyparser({ multipart: true }))
 app.use(json())
 if (process.env.NODE_ENV !== 'test') app.use(logger())
 app.use(staticFiles(path.join(__dirname, '/public')))

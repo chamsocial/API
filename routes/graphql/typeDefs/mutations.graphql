@@ -12,4 +12,10 @@ type Mutation {
     comment: String!
     parentId: Int
   ): Comment
+  createPost(
+    title: String!
+    content: String!
+    status: PostStatus
+    groupId: ID
+  ): Post
 }
