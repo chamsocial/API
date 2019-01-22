@@ -95,7 +95,7 @@ const mutations = {
     if (!me) throw new AuthenticationError('You must be logged in.')
 
     console.log(title, status)
-    return null
+    return { id: 23 }
   },
 }
 

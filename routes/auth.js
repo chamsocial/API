@@ -4,9 +4,11 @@ router.get('/test', async ctx => {
   ctx.body = ctx.user
 })
 
-router.all('/upload', async ctx => {
+router.all('/upload/:id', async ctx => {
   console.log(ctx.request.files)
-  ctx.body = 'hello'
+  console.log('ID', ctx.params.id)
+  console.log('body', ctx.request.body)
+  ctx.body = Math.round(Math.random() * 1000)
 })
 
 router.get('/logout', async ctx => {
