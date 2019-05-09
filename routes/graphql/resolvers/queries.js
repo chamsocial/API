@@ -1,3 +1,4 @@
+const { AuthenticationError } = require('apollo-server-koa')
 const { Post, User } = require('../../../models')
 
 const queries = {
@@ -24,10 +25,17 @@ const queries = {
       })
   ),
 
+  postMedia: () => [{
+    id: 'asdadsad',
+    type: 'image',
+    url: '/images/moose.png',
+  }],
+
 
   drafts(_, args, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
     return Post.findAll({
-      where: { user_id: me.id },
+      where: { user_id: me.id, status: 'draft' },
       limit: 10,
       order: [['created_at', 'DESC']],
     })

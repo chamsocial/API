@@ -8,6 +8,9 @@ enum PostStatus {
   published
   deleted
 }
+enum FileType {
+  image
+}
 
 type User {
   id: ID!
@@ -47,4 +50,10 @@ type Comment {
   parentId: Int
   author: User
   comments: [Comment]
+}
+
+type Media {
+  id: ID!
+  type: FileType!
+  url: String!
 }

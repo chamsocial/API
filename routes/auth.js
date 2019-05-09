@@ -10,8 +10,8 @@ router.all('/upload/:id', async ctx => {
   console.log(ctx.request.files)
   console.log('ID', ctx.params.id)
   console.log('body', ctx.request.body)
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  ctx.body = Math.round(Math.random() * 1000)
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  ctx.body = { id: Math.round(Math.random() * 1000), type: 'image', url: '/images/moose.png' }
 })
 
 router.get('/logout', async ctx => {
