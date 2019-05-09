@@ -8,7 +8,6 @@ const config = require('../config/db.js')[env]
 const redisClient = require('../config/redis')
 
 const db = {}
-config.operatorsAliases = false
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config)
 

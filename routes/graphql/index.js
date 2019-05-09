@@ -7,7 +7,7 @@ const server = new ApolloServer({
   typeDefs,
   context: ({ ctx }) => ({ ctx, me: ctx.user }),
   formatError: error => {
-    console.log('GraphQL error:', error)
+    console.log('GraphQL error:', error.message, error.originalError.stack)
     if (error.extensions.code === 'INTERNAL_SERVER_ERROR') return new Error('Internal server error')
     return error
   },
