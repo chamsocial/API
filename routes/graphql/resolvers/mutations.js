@@ -101,7 +101,9 @@ const mutations = {
 
   deleteDraft(_, { id }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
-    return Post.destroy({ where: { id, user_id: me.id } }).then(() => true)
+    return Post
+      .update({ status: 'deleted' }, { where: { id, user_id: me.id } })
+      .then(() => true)
   },
 }
 
