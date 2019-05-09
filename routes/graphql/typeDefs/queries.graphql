@@ -4,4 +4,5 @@ type Query {
   postsInfo: postsInfoType!
   post(slug: String!): Post
   user(slug: String!): User
+  drafts: [Post]
 }

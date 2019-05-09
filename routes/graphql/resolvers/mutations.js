@@ -97,6 +97,12 @@ const mutations = {
     console.log(title, status)
     return { id: 23 }
   },
+
+
+  deleteDraft(_, { id }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    return Post.destroy({ where: { id, user_id: me.id } }).then(() => true)
+  },
 }
 
 module.exports = mutations

@@ -18,4 +18,5 @@ type Mutation {
     status: PostStatus
     groupId: ID
   ): Post
+  deleteDraft(id: ID!): Boolean!
 }
