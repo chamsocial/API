@@ -6,7 +6,8 @@
     "start": "node bin/www",
     "dev": "./node_modules/.bin/nodemon bin/www",
     "prd": "pm2 start bin/www",
-    "test": "mocha"
+    "test": "mocha",
+    "debug": "nodemon --inspect ./bin/www"
   },
   "nodemonConfig": {
     "ext": "js, mjs, json, graphql"

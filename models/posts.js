@@ -1,15 +1,16 @@
 const showdown = require('showdown')
+
 const converter = new showdown.Converter()
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function PostModel(sequelize, DataTypes) {
   const Post = sequelize.define('Post', {
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {
         model: 'users',
-        key: 'id'
+        key: 'id',
       },
-      allowNull: false
+      allowNull: false,
     },
     status: { type: DataTypes.ENUM('draft', 'published', 'deleted'), allowNull: false, defaultValue: 'draft' },
     slug: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -17,26 +18,24 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {
         model: 'groups',
-        key: 'id'
+        key: 'id',
       },
-      allowNull: false
+      allowNull: false,
     },
     comments_count: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     title: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      defaultValue: '',
-      get () {
-        return converter.makeHtml(this.getDataValue('content'))
-      }
-    }
+    content: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
   }, {
+    getterMethods: {
+      htmlContent() {
+        return converter.makeHtml(this.getDataValue('content'))
+      },
+    },
     tableName: 'posts',
     underscored: true,
-    deletedAt: false
+    deletedAt: false,
   })
 
   Post.publicFields = [
@@ -46,7 +45,7 @@ module.exports = function (sequelize, DataTypes) {
     'comments_count',
     'created_at',
     'slug',
-    'author'
+    'author',
   ]
 
   return Post

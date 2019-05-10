@@ -6,4 +6,5 @@ type Query {
   postMedia(postId: ID!): [Media]
   user(slug: String!): User
   drafts: [Post]
+  draft(postId: ID!): Post
 }

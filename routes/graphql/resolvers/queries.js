@@ -40,6 +40,10 @@ const queries = {
       order: [['created_at', 'DESC']],
     })
   },
+  draft(_, { postId }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    return Post.findOne({ where: { id: postId, user_id: me.id, status: 'draft' } })
+  },
 
 
   user: (_, { slug }) => User.findOne({ where: { slug } }),
