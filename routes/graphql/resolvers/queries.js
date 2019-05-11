@@ -25,11 +25,10 @@ const queries = {
       })
   ),
 
-  postMedia: () => [{
-    id: 'asdadsad',
-    type: 'image',
-    url: '/images/moose.png',
-  }],
+  postMedia: async (_, { postId }) => {
+    const post = await Post.findByPk(postId)
+    return post.getMedia()
+  },
 
 
   drafts(_, args, { me }) {

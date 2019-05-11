@@ -99,11 +99,16 @@ const mutations = {
 
     return newComment
   },
-  async createPost(_, { title, status }, { me }) {
+  async createPost(_, { title, content, status }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
-
-    console.log(title, status)
-    return { id: 23 }
+    return Post.create({
+      user_id: me.id,
+      title,
+      content,
+      status,
+      slug: uuidv4(),
+      group_id: 6,
+    })
   },
 
 
