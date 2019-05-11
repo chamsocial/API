@@ -1,4 +1,4 @@
-const { AuthenticationError } = require('apollo-server-koa')
+const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
 const { Post, User } = require('../../../models')
 
 const queries = {
@@ -39,9 +39,11 @@ const queries = {
       order: [['created_at', 'DESC']],
     })
   },
-  draft(_, { postId }, { me }) {
+  draft: async (_, { postId }, { me }) => {
     if (!me) throw new AuthenticationError('You must be logged in.')
-    return Post.findOne({ where: { id: postId, user_id: me.id, status: 'draft' } })
+    const post = await Post.findOne({ where: { id: postId, user_id: me.id, status: 'draft' } })
+    if (!post) throw new ForbiddenError('No draft exist!')
+    return post
   },
 
 
