@@ -38,6 +38,24 @@ db.Comment.Comment = db.Comment.hasMany(db.Comment, { foreignKey: 'parent_id' })
 
 db.Activation.User = db.Activation.belongsTo(db.User)
 
+
+db.Post.belongsToMany(db.Media, {
+  through: {
+    model: db.MediaRelations,
+    unique: false,
+  },
+  foreignKey: 'id',
+})
+
+db.Media.belongsToMany(db.Post, {
+  through: {
+    model: db.MediaRelations,
+    unique: false,
+  },
+  foreignKey: 'media_id',
+})
+
+
 // Trigger emails
 function triggerEmail(type, id) {
   redisClient.publish('send_email', JSON.stringify({ command: type, params: { id } }))

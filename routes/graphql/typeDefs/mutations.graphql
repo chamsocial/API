@@ -19,4 +19,6 @@ type Mutation {
     groupId: ID
   ): Post
   deleteDraft(id: ID!): Boolean!
+
+  uploadFile(file: Upload!, postId: ID!): Media!
 }

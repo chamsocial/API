@@ -1,9 +1,17 @@
+const fs = require('fs')
+const path = require('path')
+const { promisify } = require('util')
+const gm = require('gm')
+const uuidv4 = require('uuid/v4')
 const { UserInputError, AuthenticationError } = require('apollo-server-koa')
 const {
-  Activation, User, Post, Comment,
+  Activation, User, Post, Comment, Media,
   Op, sequelize,
 } = require('../../../models')
 const createUser = require('../../../mutators/createUser')
+
+const fsStat = promisify(fs.stat)
+const fsMkdir = promisify(fs.mkdir)
 
 function invalidUserError(title = 'Invalid username or password') {
   const error = new Error(title)
@@ -104,6 +112,55 @@ const mutations = {
     return Post
       .update({ status: 'deleted' }, { where: { id, user_id: me.id } })
       .then(() => true)
+  },
+
+  async uploadFile(parent, { file, postId }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    // { filename: 'logo.png', mimetype: 'image/png', encoding: '7bit' }
+    const { createReadStream, filename, mimetype } = await file
+    const stream = createReadStream()
+
+
+    const publicFolderPath = path.resolve(__dirname, '../../../public')
+    const parsedFile = path.parse(filename)
+    const newFilename = `${uuidv4()}${parsedFile.ext}`
+    const publicPath = `/uploads/${me.id}/`
+    const absPath = `${publicFolderPath}${publicPath}`
+    const newFilePath = `${absPath}${newFilename}`
+
+    const mediaData = {
+      user_id: me.id,
+      filename: newFilename,
+      mime: mimetype,
+    }
+
+    // // Verify or create path
+    await fsStat(absPath).catch(() => fsMkdir(absPath))
+
+    // Save the image
+    await new Promise((resolve, reject) => {
+      gm(stream)
+        .autoOrient()
+        .resize(2500, 2500, '>')
+        .size((err, size) => {
+          if (!err) return
+          mediaData.width = size.width
+          mediaData.height = size.height
+        })
+        .write(newFilePath, err => {
+          if (err) return reject(err)
+          return resolve()
+        })
+    })
+
+    const fileInfo = await fsStat(newFilePath)
+    mediaData.size = fileInfo.size
+
+    const media = await Media.create(mediaData)
+
+    await media.addPosts([postId])
+
+    return media
   },
 }
 

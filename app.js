@@ -37,7 +37,7 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 // middlewares
-app.use(bodyparser({ multipart: true }))
+app.use(bodyparser())
 app.use(json())
 if (process.env.NODE_ENV !== 'test') app.use(logger())
 app.use(staticFiles(path.join(__dirname, '/public')))
