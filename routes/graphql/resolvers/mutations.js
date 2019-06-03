@@ -3,7 +3,7 @@ const path = require('path')
 const { promisify } = require('util')
 const gm = require('gm')
 const uuidv4 = require('uuid/v4')
-const { UserInputError, AuthenticationError } = require('apollo-server-koa')
+const { UserInputError, AuthenticationError, ApolloError } = require('apollo-server-koa')
 const {
   Activation, User, Post, Comment, Media,
   Op, sequelize,
@@ -12,6 +12,7 @@ const createUser = require('../../../mutators/createUser')
 
 const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
+const fsUnlink = promisify(fs.unlink)
 
 function invalidUserError(title = 'Invalid username or password') {
   const error = new Error(title)
@@ -166,6 +167,20 @@ const mutations = {
     await media.addPosts([postId])
 
     return media
+  },
+
+
+  async deleteFile(_, { id }, { me }) {
+    const media = await Media.findByPk(id)
+    if (!media) throw new ApolloError('No file found')
+    if (media.user_id !== me.id) throw new AuthenticationError('No, just no!')
+
+    const filePath = path.resolve(__dirname, '../../../public/uploads/', String(media.user_id), media.filename)
+
+    await fsUnlink(filePath)
+    await media.destroy()
+
+    return id
   },
 }
 

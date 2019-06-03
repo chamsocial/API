@@ -21,4 +21,5 @@ type Mutation {
   deleteDraft(id: ID!): Boolean!
 
   uploadFile(file: Upload!, postId: ID!): Media!
+  deleteFile(id: ID!): ID!
 }
