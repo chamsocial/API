@@ -18,6 +18,13 @@ type Mutation {
     status: PostStatus
     groupId: ID
   ): Post
+  editPost(
+    id: ID!
+    title: String!
+    content: String!
+    status: PostStatus
+    groupId: ID
+  ): Post
   deleteDraft(id: ID!): Boolean!
 
   uploadFile(file: Upload!, postId: ID!): Media!

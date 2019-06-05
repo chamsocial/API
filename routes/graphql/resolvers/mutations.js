@@ -100,6 +100,8 @@ const mutations = {
 
     return newComment
   },
+
+
   async createPost(_, { title, content, status }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
     return Post.create({
@@ -110,6 +112,19 @@ const mutations = {
       slug: uuidv4(),
       group_id: 6,
     })
+  },
+  async editPost(_, args, { me }) {
+    const post = await Post.findByPk(args.id)
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (post.user_id !== me.id) throw new AuthenticationError('You can\'t edit some one else post.')
+
+    post.title = args.title
+    post.content = args.content
+    post.status = args.status
+    post.group_id = args.groupId
+
+    await post.save()
+    return post
   },
 
 
