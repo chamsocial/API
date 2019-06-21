@@ -102,14 +102,20 @@ const mutations = {
   },
 
 
-  async createPost(_, { title, content, status }, { me }) {
+  async createPost(_, {
+    title, content, status, groupId,
+  }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
+    if (status === 'published' && !groupId) {
+      throw new UserInputError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
+    }
+
     return Post.create({
       user_id: me.id,
       title,
       content,
       status,
-      slug: uuidv4(),
+      slug: uuidv4(), // Create proper slug
       group_id: 6,
     })
   },

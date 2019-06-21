@@ -8,10 +8,15 @@ const queries = {
   posts(_, { limit: limitInput = 10, page = 1 }) {
     const limit = limitInput < 100 ? limitInput : 100
     const offset = limitInput * (page - 1)
-    return Post.findAll({ limit, offset, order: [['created_at', 'DESC']] })
+    return Post.findAll({
+      where: { status: 'published' },
+      limit,
+      offset,
+      order: [['created_at', 'DESC']],
+    })
   },
   postsInfo: async () => ({
-    count: await Post.count(),
+    count: await Post.count({ where: { status: 'published' } }),
   }),
   post: (_, { slug }) => (
     Post.findOne({ where: { slug } })
