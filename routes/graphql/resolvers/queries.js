@@ -1,5 +1,5 @@
 const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
-const { Post, User } = require('../../../models')
+const { Post, User, GroupContent } = require('../../../models')
 
 const queries = {
   me: (_, args, { me }) => me,
@@ -10,13 +10,9 @@ const queries = {
     const offset = limitInput * (page - 1)
     return Post.findAll({ limit, offset, order: [['created_at', 'DESC']] })
   },
-
-
   postsInfo: async () => ({
     count: await Post.count(),
   }),
-
-
   post: (_, { slug }) => (
     Post.findOne({ where: { slug } })
       .then(post => {
@@ -24,7 +20,6 @@ const queries = {
         return post
       })
   ),
-
   postMedia: async (_, { postId }) => {
     const post = await Post.findByPk(postId)
     return post.getMedia()
@@ -41,9 +36,14 @@ const queries = {
   },
   draft: async (_, { postId }, { me }) => {
     if (!me) throw new AuthenticationError('You must be logged in.')
-    const post = await Post.findOne({ where: { id: postId, user_id: me.id, status: 'draft' } })
+    const post = await Post.findOne({ where: { id: postId, user_id: me.id } })
     if (!post) throw new ForbiddenError('No draft exist!')
     return post
+  },
+
+
+  groups() {
+    return GroupContent.findAll({ where: { lang: 'en' } })
   },
 
 

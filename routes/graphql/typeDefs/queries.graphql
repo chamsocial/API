@@ -7,4 +7,5 @@ type Query {
   user(slug: String!): User
   drafts: [Post]
   draft(postId: ID!): Post
+  groups: [Group]!
 }

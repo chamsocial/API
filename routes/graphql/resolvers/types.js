@@ -1,12 +1,15 @@
 const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
-const { User, Comment, Post } = require('../../../models')
+const {
+  User, Comment, Post, GroupContent,
+} = require('../../../models')
 
 const types = {
   DateTime: GraphQLDateTime,
   Post: {
-    createdAt: post => post.created_at,
     commentsCount: post => post.comments_count,
+    canEdit: (post, args, { me }) => post.user_id === me.id,
+    group: async post => GroupContent.findOne({ where: { group_id: post.group_id, lang: 'en' } }),
     author: post => User.findByPk(post.user_id),
     comments: post => Comment.findAll({ where: { post_id: post.id }, limit: 500 }),
   },
@@ -22,6 +25,9 @@ const types = {
     companyName: user => user.company_name,
     posts: user => Post.findAll({ where: { user_id: user.id }, limit: 100 }),
     avatarUrl: user => gravatar.url(user.email, { s: '100', d: 'identicon' }, true),
+  },
+  Group: {
+    id: group => group.group_id,
   },
 }
 

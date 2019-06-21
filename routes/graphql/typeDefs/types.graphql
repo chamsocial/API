@@ -38,10 +38,19 @@ type Post {
   createdAt: DateTime
   commentsCount: Int
   author: User
+  canEdit: Boolean
+  group: Group
   comments: [Comment]!
 }
 type postsInfoType {
   count: Int!
+}
+
+type Group {
+  id: ID!
+  title: String!
+  description: String
+  slug: String!
 }
 
 type Comment {
