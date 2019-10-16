@@ -1,8 +1,9 @@
 const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
+const { AuthenticationError } = require('apollo-server-koa')
 const {
   User, Comment, Post, GroupContent,
-} = require('../../../models')
+} = require('../../models')
 
 const types = {
   DateTime: GraphQLDateTime,
@@ -23,11 +24,23 @@ const types = {
     firstName: user => user.first_name,
     lastName: user => user.last_name,
     companyName: user => user.company_name,
-    posts: user => Post.findAll({ where: { user_id: user.id }, limit: 100 }),
+    posts: (user, { count = 10 }) => {
+      const limit = count >= 1 && count <= 100 ? count : 10
+      return Post.findAll({ where: { user_id: user.id, status: 'published' }, limit })
+    },
     avatarUrl: user => gravatar.url(user.email, { s: '100', d: 'identicon' }, true),
   },
   Group: {
     id: group => group.group_id,
+    subscription: (group, args, { me, loaders }) => {
+      if (!me) throw new AuthenticationError('You must be logged in.')
+      return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
+    },
+  },
+  EmailSubscription: {
+    id: groupUser => `${groupUser.user_id}-${groupUser.group_id}`,
+    groupId: groupUser => groupUser.group_id,
+    joinedAt: groupUser => groupUser.joined_at,
   },
 }
 

@@ -12,6 +12,19 @@ enum FileType {
   image
 }
 
+
+# Inputs
+
+
+input EmailSubscriptionInput {
+  groupId: ID!
+  type: String!
+}
+
+
+# Types
+
+
 type User {
   id: ID!
   slug: String!
@@ -25,7 +38,7 @@ type User {
   jobtitle: String
   avatarUrl: String
   lang: Lang
-  posts: [Post]
+  posts(count: Int): [Post]
 }
 
 type Post {
@@ -51,6 +64,8 @@ type Group {
   title: String!
   description: String
   slug: String!
+
+  subscription: String
 }
 
 type Comment {
@@ -66,4 +81,11 @@ type Media {
   id: ID!
   type: FileType!
   url: String!
+}
+
+type EmailSubscription {
+  id: ID!
+  groupId: ID!
+  joinedAt: DateTime
+  type: String
 }

@@ -7,8 +7,9 @@ const { UserInputError, AuthenticationError, ApolloError } = require('apollo-ser
 const {
   Activation, User, Post, Comment, Media,
   Op, sequelize,
-} = require('../../../models')
-const createUser = require('../../../mutators/createUser')
+} = require('../../models')
+const createUser = require('../../mutators/createUser')
+const updateEmailSubscriptions = require('./mutations/updateEmailSubscriptions')
 
 const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
@@ -21,6 +22,7 @@ function invalidUserError(title = 'Invalid username or password') {
 }
 
 const mutations = {
+  updateEmailSubscriptions,
   async login(_, { username, password }, { ctx }) {
     if (!username || !password) throw invalidUserError()
 

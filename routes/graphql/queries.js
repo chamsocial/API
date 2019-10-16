@@ -1,5 +1,7 @@
 const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
-const { Post, User, GroupContent } = require('../../../models')
+const {
+  Post, User, GroupContent, GroupUser,
+} = require('../../models')
 
 const queries = {
   me: (_, args, { me }) => me,

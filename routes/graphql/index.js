@@ -2,6 +2,7 @@
 const { ApolloServer } = require('apollo-server-koa')
 const resolvers = require('./resolvers')
 const typeDefs = require('./typeDefs')
+const loaders = require('./dataloaders')
 
 class BasicLogging {
   requestDidStart(data) {
@@ -12,7 +13,7 @@ class BasicLogging {
 const server = new ApolloServer({
   resolvers,
   typeDefs,
-  context: ({ ctx }) => ({ ctx, me: ctx.user }),
+  context: ({ ctx }) => ({ loaders, ctx, me: ctx.user }),
   formatError: error => {
     console.log('GraphQL error:', error.message, error.originalError && error.originalError.stack)
     if (error.extensions.code === 'INTERNAL_SERVER_ERROR') return new Error('Internal server error')

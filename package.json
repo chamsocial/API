@@ -17,6 +17,7 @@
   "dependencies": {
     "apollo-server-koa": "^2.1.0",
     "bcryptjs": "^2.4.3",
+    "dataloader": "^1.4.0",
     "debug": "*",
     "dotenv": "^8.0.0",
     "gm": "^1.23.1",
