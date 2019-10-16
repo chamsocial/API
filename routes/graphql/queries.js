@@ -1,6 +1,6 @@
 const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
 const {
-  Post, User, GroupContent, GroupUser,
+  Post, User, GroupContent,
 } = require('../../models')
 
 const queries = {
@@ -21,7 +21,7 @@ const queries = {
     count: await Post.count({ where: { status: 'published' } }),
   }),
   post: (_, { slug }) => (
-    Post.findOne({ where: { slug } })
+    Post.findOne({ where: { slug, status: 'published' } })
       .then(post => {
         if (!post) throw new Error('No post found!')
         return post
