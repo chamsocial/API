@@ -1,20 +1,20 @@
 /* eslint-env mocha */
 const chai = require('chai')
-const expect = chai.expect
+
+const { expect } = chai
 const supertest = require('supertest')
 
 const app = require('../app')
 const setup = require('./helpers/setup')
 const factory = require('./helpers/factory')
+
 const request = supertest.agent(app.listen())
 
 describe('Post routes', () => {
   let post
-  beforeEach(() => {
-    return setup.initDB()
-      .then(() => factory.create('Post'))
-      .then(createdPost => (post = createdPost))
-  })
+  beforeEach(() => setup.initDB()
+    .then(() => factory.create('Post'))
+    .then(createdPost => { post = createdPost }))
   afterEach(() => setup.destroyDB())
 
   it('should respond with an array of posts', () => {
@@ -29,7 +29,7 @@ describe('Post routes', () => {
     return request
       .post('/graphql')
       .send({ operationName: null, query, variables: null })
-      .then((res) => {
+      .then(res => {
         expect(res.body.data.posts).to.be.an('array')
         expect(res.status).to.equal(200)
       })
@@ -47,7 +47,7 @@ describe('Post routes', () => {
     return request
       .post('/graphql')
       .send({ operationName: null, query, variables: null })
-      .then((res) => {
+      .then(res => {
         expect(res.body.errors[0].message).to.contain('content')
         expect(res.status).to.equal(200)
       })
@@ -67,7 +67,7 @@ describe('Post routes', () => {
       .post('/graphql')
       .send({ operationName: null, query, variables: null })
       .set('Authorization', `bearer ${token}`)
-      .then((res) => {
+      .then(res => {
         expect(res.body.data.posts[0]).to.have.include.key('content')
         expect(res.status).to.equal(200)
       })
@@ -87,7 +87,7 @@ describe('Post routes', () => {
     return request
       .post('/graphql')
       .send({ operationName: null, query, variables: null })
-      .then((res) => {
+      .then(res => {
         expect(res.body.data.posts).to.be.an('array')
         expect(res.body.data.posts[0]).to.have.any.keys('author')
         expect(res.body.data.posts[0].author).to.have.any.keys('username')
@@ -110,7 +110,7 @@ describe('Post routes', () => {
         .post('/graphql')
         .send({ operationName: null, query, variables: { slug: post.slug } })
         .set('Authorization', `bearer ${token}`)
-        .then((res) => {
+        .then(res => {
           expect(res.body.data.post).to.have.all.keys('id', 'slug', 'content', 'title')
           expect(res.body.data.post.title).to.equal(post.title)
           expect(res.body.data.post.slug).to.equal(post.slug)

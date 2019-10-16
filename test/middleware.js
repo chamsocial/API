@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 const chai = require('chai')
-const expect = chai.expect
+
+const { expect } = chai
 
 const setup = require('./helpers/setup')
 const { decodeJwt } = require('../routes/middleware')
@@ -10,7 +11,7 @@ describe('Middleware', () => {
     it('should set a user ID on the context object', async () => {
       const token = setup.jwtToken()
       const ctx = {
-        request: { headers: { authorization: `bearer ${token}` } }
+        request: { headers: { authorization: `bearer ${token}` } },
       }
       const next = () => Promise.resolve()
       await decodeJwt(ctx, next)

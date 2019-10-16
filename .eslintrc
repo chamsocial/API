@@ -2,6 +2,7 @@
   "extends": "airbnb-base",
   "rules": {
     "semi": ["error", "never"],
-    "arrow-parens": ["error", "as-needed"]
+    "arrow-parens": ["error", "as-needed"],
+    "no-param-reassign": 0
   }
 }

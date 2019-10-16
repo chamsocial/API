@@ -1,7 +1,10 @@
 const assign = require('lodash.assign')
 const { attributeFields, defaultListArgs, resolver } = require('graphql-sequelize')
-const { GraphQLObjectType, GraphQLList, GraphQLString, GraphQLInt } = require('graphql')
+const {
+  GraphQLObjectType, GraphQLList, GraphQLString, GraphQLInt,
+} = require('graphql')
 const { Post, User, Comment } = require('../models')
+
 const defaultModelArgs = defaultListArgs()
 
 const types = {
@@ -12,25 +15,25 @@ const types = {
       author: {
         type: types.user,
         args: defaultModelArgs,
-        resolve: resolver(Post.User)
+        resolve: resolver(Post.User),
       },
       comments: {
         type: new GraphQLList(types.comment),
         args: defaultModelArgs,
         resolve: resolver(Post.Comment, {
-          before (findOptions) {
+          before(findOptions) {
             if (!findOptions.where) findOptions.where = {}
             findOptions.where.$or = [{ parent_id: 0 }, { parent_id: null }]
 
             if (!findOptions.order) {
-              findOptions.order = [ [ 'created_at', 'ASC' ] ]
+              findOptions.order = [['created_at', 'ASC']]
             }
 
             return findOptions
-          }
-        })
-      }
-    })
+          },
+        }),
+      },
+    }),
   }),
   postsInfo: new GraphQLObjectType({
     name: 'PostsInfo',
@@ -38,9 +41,9 @@ const types = {
     fields: {
       count: {
         type: GraphQLInt,
-        resolve: () => Post.count()
-      }
-    }
+        resolve: () => Post.count(),
+      },
+    },
   }),
   user: new GraphQLObjectType({
     name: 'User',
@@ -49,9 +52,9 @@ const types = {
       posts: {
         type: new GraphQLList(types.post),
         args: defaultModelArgs,
-        resolve: resolver(User.Post)
-      }
-    })
+        resolve: resolver(User.Post),
+      },
+    }),
   }),
   comment: new GraphQLObjectType({
     name: 'Comment',
@@ -60,21 +63,21 @@ const types = {
       author: {
         type: types.user,
         args: defaultModelArgs,
-        resolve: resolver(Comment.User)
+        resolve: resolver(Comment.User),
       },
       comments: {
         type: new GraphQLList(types.comment),
         args: defaultModelArgs,
         resolve: resolver(Comment.Comment, {
-          before (findOptions) {
+          before(findOptions) {
             if (!findOptions.order) {
-              findOptions.order = [ [ 'created_at', 'ASC' ] ]
+              findOptions.order = [['created_at', 'ASC']]
             }
             return findOptions
-          }
-        })
-      }
-    })
+          },
+        }),
+      },
+    }),
   }),
   activation: new GraphQLObjectType({
     name: 'Activation',
@@ -83,14 +86,14 @@ const types = {
       user: {
         type: types.user,
         args: defaultModelArgs,
-        resolve: (mutationData) => mutationData.user
+        resolve: mutationData => mutationData.user,
       },
       token: {
         type: GraphQLString,
-        resolve: (mutationData) => mutationData.token
-      }
-    })
-  })
+        resolve: mutationData => mutationData.token,
+      },
+    }),
+  }),
 }
 
 module.exports = types

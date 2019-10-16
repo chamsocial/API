@@ -1,4 +1,5 @@
 const showdown = require('showdown')
+
 const converter = new showdown.Converter()
 
 module.exports = function (sequelize, DataTypes) {
@@ -7,17 +8,17 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {
         model: 'posts',
-        key: 'id'
+        key: 'id',
       },
-      defaultValue: 0
+      defaultValue: 0,
     },
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {
         model: 'users',
-        key: 'id'
+        key: 'id',
       },
-      allowNull: false
+      allowNull: false,
     },
     parent_id: { type: DataTypes.INTEGER.UNSIGNED, default: 0 },
     email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
@@ -26,15 +27,15 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false,
       defaultValue: '',
-      get () {
+      get() {
         return converter.makeHtml(this.getDataValue('content'))
-      }
-    }
+      },
+    },
   }, {
     tableName: 'comments',
     underscored: true,
     deletedAt: false,
-    updatedAt: false
+    updatedAt: false,
   })
 
   Comment.publicFields = []

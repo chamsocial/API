@@ -4,7 +4,7 @@ const mutations = require('./mutations')
 
 const schema = new GraphQLSchema({
   query: queries,
-  mutation: mutations
+  mutation: mutations,
 })
 
 module.exports = schema
