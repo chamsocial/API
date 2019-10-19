@@ -1,6 +1,6 @@
 const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
 const {
-  Post, User, GroupContent, sequelize,
+  Post, User, sequelize,
 } = require('../../models')
 
 const queries = {
