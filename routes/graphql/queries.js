@@ -1,6 +1,6 @@
 const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
 const {
-  Post, User, GroupContent,
+  Post, User, GroupContent, sequelize,
 } = require('../../models')
 
 const queries = {
@@ -50,8 +50,20 @@ const queries = {
   },
 
 
-  groups() {
-    return GroupContent.findAll({ where: { lang: 'en' } })
+  groups: async () => {
+    const groups = await sequelize.query(
+      `
+        SELECT
+          groups_content.*,
+          (SELECT COUNT(*) FROM posts WHERE posts.group_id = groups_content.group_id) AS postCount
+        FROM groups_content
+        WHERE lang = 'en'
+        AND slug != 'postmaster'
+        ORDER BY postCount DESC
+      `,
+      { type: sequelize.QueryTypes.SELECT },
+    )
+    return groups
   },
 
 
