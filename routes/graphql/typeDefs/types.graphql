@@ -41,6 +41,10 @@ type User {
   posts(count: Int): [Post]
 }
 
+type PostsList {
+  totalCount: Int
+  list: [Post]!
+}
 type Post {
   id: ID!
   title: String!
@@ -81,11 +85,4 @@ type Media {
   id: ID!
   type: FileType!
   url: String!
-}
-
-type EmailSubscription {
-  id: ID!
-  groupId: ID!
-  joinedAt: DateTime
-  type: String
 }

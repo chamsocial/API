@@ -1,6 +1,6 @@
 type Query {
   me: User
-  posts(limit: Int page: Int): [Post]!
+  posts(page: Int): PostsList!
   postsInfo: postsInfoType!
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!

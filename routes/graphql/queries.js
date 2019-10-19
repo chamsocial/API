@@ -7,15 +7,16 @@ const queries = {
   me: (_, args, { me }) => me,
 
 
-  posts(_, { limit: limitInput = 10, page = 1 }) {
+  posts: async (_, { limit: limitInput = 10, page = 1 }) => {
     const limit = limitInput < 100 ? limitInput : 100
     const offset = limitInput * (page - 1)
-    return Post.findAll({
+    const posts = await Post.findAll({
       where: { status: 'published' },
       limit,
       offset,
       order: [['created_at', 'DESC']],
     })
+    return { list: posts }
   },
   postsInfo: async () => ({
     count: await Post.count({ where: { status: 'published' } }),
