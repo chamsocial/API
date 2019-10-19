@@ -1,0 +1,33 @@
+type Mutation {
+  login(username: String! password: String!): User
+  createUser(username: String! email: String! password: String!): User
+  activateUser(code: String!): User
+  updateUser(
+    firstName: String lastName: String
+    jobtitle: String lang: Lang interests: String
+    aboutme: String companyName: String
+  ): User
+  updateEmailSubscriptions(settings: [EmailSubscriptionInput!]!): Boolean
+  createComment(
+    postSlug: String!
+    comment: String!
+    parentId: Int
+  ): Comment
+  createPost(
+    title: String!
+    content: String!
+    status: PostStatus
+    groupId: ID
+  ): Post
+  editPost(
+    id: ID!
+    title: String!
+    content: String!
+    status: PostStatus
+    groupId: ID
+  ): Post
+  deletePost(id: ID!): Boolean
+
+  uploadFile(file: Upload!, postId: ID!): Media!
+  deleteFile(id: ID!): ID!
+}

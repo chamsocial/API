@@ -1,0 +1,11 @@
+type Query {
+  me: User
+  posts(postsPerPage: Int, page: Int): PostsList!
+  postsInfo: postsInfoType!
+  post(slug: String!): Post
+  postMedia(postId: ID!): [Media]!
+  user(slug: String!): User
+  drafts: [Post]
+  draft(postId: ID!): Post
+  groups: [Group]!
+}

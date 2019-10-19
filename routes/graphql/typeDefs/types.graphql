@@ -1,0 +1,88 @@
+scalar DateTime
+enum Lang {
+  en
+  fr
+}
+enum PostStatus {
+  draft
+  published
+  deleted
+}
+enum FileType {
+  image
+}
+
+
+# Inputs
+
+
+input EmailSubscriptionInput {
+  groupId: ID!
+  type: String!
+}
+
+
+# Types
+
+
+type User {
+  id: ID!
+  slug: String!
+  email: String
+  username: String
+  firstName: String
+  lastName: String
+  companyName: String
+  interests: String
+  aboutme: String
+  jobtitle: String
+  avatarUrl: String
+  lang: Lang
+  posts(count: Int): [Post]
+}
+
+type PostsList {
+  totalCount: Int
+  list: [Post]!
+}
+type Post {
+  id: ID!
+  title: String!
+  slug: String!
+  status: PostStatus
+  content: String
+  htmlContent: String
+  createdAt: DateTime
+  commentsCount: Int
+  author: User
+  canEdit: Boolean
+  group: Group
+  comments: [Comment]!
+}
+type postsInfoType {
+  count: Int!
+}
+
+type Group {
+  id: ID!
+  title: String!
+  description: String
+  slug: String!
+
+  subscription: String
+}
+
+type Comment {
+  id: ID!
+  createdAt: DateTime
+  content: String
+  parentId: Int
+  author: User
+  comments: [Comment]
+}
+
+type Media {
+  id: ID!
+  type: FileType!
+  url: String!
+}

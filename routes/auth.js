@@ -1,34 +1,13 @@
 const router = require('koa-router')()
-router.prefix('/v2')
-const authUtils = require('../utils/auth')
 
-const { User } = require('../models')
+router.get('/test', async ctx => {
+  if (!ctx.user) throw new Error('Hmm')
+  ctx.body = ctx.user
+})
 
-function invalidUserError (title = 'Invalid username or password') {
-  const error = new Error(title)
-  error.status = 401
-  return error
-}
-
-router.post('/login', async (ctx, next) => {
-  const { username, password } = ctx.request.body
-  if (!username || !password) ctx.throw(invalidUserError())
-
-  const user = await User.findOne({ where: { $or: [{ username }, { email: username }] } })
-  if (!user) ctx.throw(invalidUserError())
-
-  const activationText = 'The account has not been activated yet. If you have not received the email try to reset your password.'
-  if (!user.hasActivated()) ctx.throw(invalidUserError(activationText))
-
-  const validPassword = await user.validPassword(password)
-  if (!validPassword) ctx.throw(invalidUserError())
-
-  await user.updateAttributes({ last_login: new Date() })
-
-  ctx.body = {
-    user: user.getPublicData(),
-    token: authUtils.generateJWT(user)
-  }
+router.get('/logout', async ctx => {
+  ctx.session = null
+  ctx.body = { success: true }
 })
 
 module.exports = router

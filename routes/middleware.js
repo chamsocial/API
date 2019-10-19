@@ -1,24 +1,20 @@
-const jwt = require('jsonwebtoken')
-const { JWT_SECRET } = process.env
+const { User } = require('../models')
 
-async function decodeJwt (ctx, next) {
-  const authorization = ctx.request.headers.authorization
-  if (!authorization) {
-    await next()
-    return
-  }
+function isAuthorized(ctx, next) {
+  if (ctx.session.user) return next()
 
-  const token = authorization.split(' ').pop()
-  try {
-    ctx.userToken = await jwt.verify(token, JWT_SECRET)
-  } catch (e) {
-    const error = new Error('Invalid or expired token')
-    error.status = 401
-    ctx.throw(error)
-  }
-  await next()
+  const error = new Error('Unauthorized!')
+  error.status = 401
+  return ctx.throw(error)
+}
+
+const setUser = async (ctx, next) => {
+  if (!ctx.session.user) return next()
+  ctx.user = await User.findByPk(ctx.session.user)
+  return next()
 }
 
 module.exports = {
-  decodeJwt
+  isAuthorized,
+  setUser,
 }
