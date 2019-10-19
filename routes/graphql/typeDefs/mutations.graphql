@@ -3,7 +3,7 @@ type Mutation {
   createUser(username: String! email: String! password: String!): User
   activateUser(code: String!): User
   updateUser(
-    slug: String! firstName: String lastName: String
+    firstName: String lastName: String
     jobtitle: String lang: Lang interests: String
     aboutme: String companyName: String
   ): User

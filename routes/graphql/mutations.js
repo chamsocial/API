@@ -65,8 +65,8 @@ const mutations = {
     return user.getPublicData()
   },
 
-  async updateUser(_, { slug, ...fields }, { me }) {
-    if (!me || me.slug !== slug) throw new AuthenticationError('You are not authorized to edit this profile.')
+  async updateUser(_, fields, { me }) {
+    if (!me) throw new AuthenticationError('You are not authorized to edit this profile.')
 
     const user = await User.findByPk(me.id)
     user.first_name = fields.firstName
