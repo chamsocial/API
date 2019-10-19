@@ -24,6 +24,10 @@ const types = {
     firstName: user => user.first_name,
     lastName: user => user.last_name,
     companyName: user => user.company_name,
+    email: (user, args, { me }) => {
+      if (user.id !== me.id) return null
+      return user.email
+    },
     posts: (user, { count = 10 }) => {
       const limit = count >= 1 && count <= 100 ? count : 10
       return Post.findAll({ where: { user_id: user.id, status: 'published' }, limit })
@@ -36,11 +40,6 @@ const types = {
       if (!me) throw new AuthenticationError('You must be logged in.')
       return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
     },
-  },
-  EmailSubscription: {
-    id: groupUser => `${groupUser.user_id}-${groupUser.group_id}`,
-    groupId: groupUser => groupUser.group_id,
-    joinedAt: groupUser => groupUser.joined_at,
   },
 }
 
