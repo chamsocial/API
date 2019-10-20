@@ -1,5 +1,4 @@
 const path = require('path')
-// const Jimp = require('jimp')
 const sharp = require('sharp')
 const router = require('koa-router')()
 
@@ -30,7 +29,7 @@ router.get('/img/:h/:w/uploads/:userId/:filename', async ctx => {
   const {
     w, h, userId, filename,
   } = ctx.params
-  const ext = path.extname(filename).replace('.', '')
+  const ext = path.extname(filename).replace('.', '').toLowerCase()
   const mime = mimes[ext]
   if (!mime) throw new Error('Invalid file format')
   let width = parseInt(w, 10)
