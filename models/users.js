@@ -90,7 +90,7 @@ module.exports = function userDefinition(sequelize, DataTypes) {
   User.addHook('beforeUpdate', hashPassword)
 
   User.prototype.validPassword = async function validPassword(password) {
-    const isCorrect = bcrypt.compare(password, this.password)
+    const isCorrect = await bcrypt.compare(password, this.password)
     if (isCorrect) return true
     return this.checkLegacyMd5(password)
   }
