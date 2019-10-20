@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-const { ApolloServer } = require('apollo-server-koa')
+const { ApolloServer, ApolloError } = require('apollo-server-koa')
 const resolvers = require('./resolvers')
 const typeDefs = require('./typeDefs')
 const loaders = require('./dataloaders')
@@ -16,6 +16,7 @@ const server = new ApolloServer({
   context: ({ ctx }) => ({ loaders, ctx, me: ctx.user }),
   formatError: error => {
     console.log('GraphQL error:', error.message, error.originalError && error.originalError.stack)
+    if (error.originalError instanceof ApolloError) return new Error(error.originalError.message)
     if (error.extensions.code === 'INTERNAL_SERVER_ERROR') return new Error('Internal server error')
     return error
   },

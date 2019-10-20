@@ -1,4 +1,4 @@
-const { AuthenticationError, ForbiddenError } = require('apollo-server-koa')
+const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
 const {
   Post, User, sequelize,
 } = require('../../models')
@@ -24,7 +24,7 @@ const queries = {
   post: (_, { slug }) => (
     Post.findOne({ where: { slug, status: 'published' } })
       .then(post => {
-        if (!post) throw new Error('No post found!')
+        if (!post) throw new ApolloError('NO_POSTS_FOUND')
         return post
       })
   ),
