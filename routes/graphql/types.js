@@ -41,6 +41,12 @@ const types = {
       return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
     },
   },
+  Media: {
+    type: media => {
+      if (['image/jpeg', 'image/png', 'image/gif'].includes(media.mime)) return 'image'
+      return null
+    },
+  },
 }
 
 module.exports = types

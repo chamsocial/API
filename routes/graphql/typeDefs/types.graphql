@@ -83,6 +83,6 @@ type Comment {
 
 type Media {
   id: ID!
-  type: FileType!
+  type: FileType
   url: String!
 }

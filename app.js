@@ -52,6 +52,7 @@ app.use(async (ctx, next) => {
     const status = ctx.status || 404
     if (status === 404) ctx.throw(404)
   } catch (err) {
+    console.error('*** ERROR ***', err)
     // will only respond with JSON
     ctx.status = err.statusCode || err.status || 500
     ctx.body = {

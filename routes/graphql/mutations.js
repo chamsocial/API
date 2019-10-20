@@ -15,6 +15,8 @@ const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
 const fsUnlink = promisify(fs.unlink)
 
+const { UPLOADS_DIR } = process.env
+
 function invalidUserError(title = 'Invalid username or password') {
   const error = new Error(title)
   error.status = 401
@@ -149,12 +151,9 @@ const mutations = {
     const { createReadStream, filename, mimetype } = await file
     const stream = createReadStream()
 
-
-    const publicFolderPath = path.resolve(__dirname, '../../../public')
     const parsedFile = path.parse(filename)
     const newFilename = `${uuidv4()}${parsedFile.ext}`
-    const publicPath = `/uploads/${me.id}/`
-    const absPath = `${publicFolderPath}${publicPath}`
+    const absPath = `${UPLOADS_DIR}${me.id}`
     const newFilePath = `${absPath}${newFilename}`
 
     const mediaData = {
