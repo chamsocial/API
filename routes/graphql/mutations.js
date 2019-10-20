@@ -109,6 +109,7 @@ const mutations = {
   async createPost(_, {
     title, content, status, groupId,
   }, { me }) {
+    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (status === 'published' && !groupId) {
       throw new UserInputError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
@@ -124,6 +125,7 @@ const mutations = {
     })
   },
   async editPost(_, args, { me }) {
+    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     const post = await Post.findByPk(args.id)
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (post.user_id !== me.id) throw new AuthenticationError('You can\'t edit some one else post.')
@@ -146,6 +148,7 @@ const mutations = {
   },
 
   async uploadFile(parent, { file, postId }, { me }) {
+    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     if (!me) throw new AuthenticationError('You must be logged in.')
     // { filename: 'logo.png', mimetype: 'image/png', encoding: '7bit' }
     const { createReadStream, filename, mimetype } = await file
@@ -193,6 +196,7 @@ const mutations = {
 
 
   async deleteFile(_, { id }, { me }) {
+    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     const media = await Media.findByPk(id)
     if (!media) throw new ApolloError('No file found')
     if (media.user_id !== me.id) throw new AuthenticationError('No, just no!')
