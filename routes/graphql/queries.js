@@ -7,11 +7,13 @@ const queries = {
   me: (_, args, { me }) => me,
 
 
-  posts: async (_, { postsPerPage = 20, page = 1 }) => {
+  posts: async (_, { postsPerPage = 20, page = 1 }, context) => {
     const limit = postsPerPage < 100 ? postsPerPage : 100
     const offset = limit * (page - 1)
+    const where = { status: 'published' }
+    context.postListWhere = where
     const posts = await Post.findAll({
-      where: { status: 'published' },
+      where,
       limit,
       offset,
       order: [['created_at', 'DESC']],
