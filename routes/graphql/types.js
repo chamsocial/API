@@ -18,7 +18,7 @@ const types = {
     totalCount: (post, args, { postListWhere }) => Post.count({ where: postListWhere }),
   },
   Comment: {
-    createdAt: comment => comment.created_at,
+    createdAt: comment => comment.created_at || comment.createdAt,
     parentId: comment => comment.parent_id,
     author: comment => User.findByPk(comment.user_id),
     comments: comment => Comment.findAll({ where: { parent_id: comment.id }, limit: 500 }),
