@@ -84,6 +84,14 @@ const mutations = {
     return user
   },
 
+  async unbounceUser(_, fields, { me }) {
+    if (!me) throw new AuthenticationError('You are not authorized.')
+    const user = await User.findByPk(me.id)
+    user.bouncing = 0
+    await user.save()
+    return user
+  },
+
   async createComment(_, { postSlug, comment, parentId }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (comment.length < 3) throw new UserInputError('Comment error', { errors: [{ message: 'To short' }] })

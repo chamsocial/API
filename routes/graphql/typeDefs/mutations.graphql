@@ -8,6 +8,7 @@ type Mutation {
     aboutme: String companyName: String
   ): User
   updateEmailSubscriptions(settings: [EmailSubscriptionInput!]!): Boolean
+  unbounceUser: User
   createComment(
     postSlug: String!
     comment: String!

@@ -38,6 +38,7 @@ type User {
   jobtitle: String
   avatarUrl: String
   lang: Lang
+  bouncing: Boolean
   posts(count: Int): [Post]
 }
 
