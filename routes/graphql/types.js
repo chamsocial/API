@@ -24,7 +24,7 @@ const types = {
     firstName: user => user.first_name,
     lastName: user => user.last_name,
     companyName: user => user.company_name,
-    email: (user, args, { me }) => {
+    email: (user, args, { me = {} }) => {
       if (user.id !== me.id) return null
       return user.email
     },

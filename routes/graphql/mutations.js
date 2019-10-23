@@ -25,7 +25,7 @@ function invalidUserError(title = 'Invalid username or password') {
 
 const mutations = {
   updateEmailSubscriptions,
-  async login(_, { username, password }, { ctx }) {
+  async login(_, { username, password }, context) {
     if (!username || !password) throw invalidUserError()
 
     const user = await User.findOne({ where: { [Op.or]: [{ username }, { email: username }] } })
@@ -38,7 +38,8 @@ const mutations = {
     if (!validPassword) throw invalidUserError()
 
     await user.update({ last_login: new Date() })
-    ctx.session.user = user.id
+    context.ctx.session.user = user.id
+    context.me = user
     return user.getPublicData()
   },
 
@@ -54,16 +55,17 @@ const mutations = {
       })
   },
 
-  async activateUser(_, { code }, { ctx }) {
+  async activateUser(_, { code }, context) {
     const activation = await Activation.findOne({ where: { code, verified_at: null } })
     if (!activation) throw new Error('No code activation found')
-    activation.verified_ip = ctx.request.ip
+    activation.verified_ip = context.ctx.request.ip
     activation.verified_at = new Date()
     await activation.save()
 
     const user = await User.findOne({ where: { id: activation.user_id } })
     await user.update({ last_login: new Date(), activated: 1 })
-    ctx.session.user = user.id
+    context.ctx.session.user = user.id
+    context.me = user
     return user.getPublicData()
   },
 
