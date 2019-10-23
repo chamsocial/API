@@ -1,16 +1,18 @@
 const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
 const {
-  Post, User, sequelize,
+  Post, User, GroupContent, sequelize,
 } = require('../../models')
 
 const queries = {
   me: (_, args, { me }) => me,
 
 
-  posts: async (_, { postsPerPage = 20, page = 1 }, context) => {
+  posts: async (_, { postsPerPage = 20, page = 1, groupId }, context) => {
     const limit = postsPerPage < 100 ? postsPerPage : 100
     const offset = limit * (page - 1)
     const where = { status: 'published' }
+    if (groupId) where.group_id = groupId
+
     context.postListWhere = where
     const posts = await Post.findAll({
       where,
@@ -67,6 +69,7 @@ const queries = {
     )
     return groups
   },
+  group: (_, { slug }) => GroupContent.findOne({ where: { slug: String(slug) } }),
 
 
   user: (_, { slug }) => User.findOne({ where: { slug } }),

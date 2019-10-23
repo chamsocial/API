@@ -1,6 +1,6 @@
 type Query {
   me: User
-  posts(postsPerPage: Int, page: Int): PostsList!
+  posts(postsPerPage: Int, page: Int, groupId: ID): PostsList!
   postsInfo: postsInfoType!
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!
@@ -8,4 +8,5 @@ type Query {
   drafts: [Post]
   draft(postId: ID!): Post
   groups: [Group]!
+  group(slug: String!): Group!
 }
