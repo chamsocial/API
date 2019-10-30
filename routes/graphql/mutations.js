@@ -119,7 +119,6 @@ const mutations = {
   async createPost(_, {
     title, content, status, groupId,
   }, { me }) {
-    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (status === 'published' && !groupId) {
       throw new UserInputError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
@@ -135,7 +134,6 @@ const mutations = {
     })
   },
   async editPost(_, args, { me }) {
-    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     const post = await Post.findByPk(args.id)
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (post.user_id !== me.id) throw new AuthenticationError('You can\'t edit some one else post.')
@@ -150,6 +148,7 @@ const mutations = {
   },
 
 
+  // @TODO remove media
   deletePost(_, { id }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
     return Post
@@ -158,7 +157,6 @@ const mutations = {
   },
 
   async uploadFile(parent, { file, postId }, { me }) {
-    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     if (!me) throw new AuthenticationError('You must be logged in.')
     // { filename: 'logo.png', mimetype: 'image/png', encoding: '7bit' }
     const { createReadStream, filename, mimetype } = await file
@@ -166,7 +164,7 @@ const mutations = {
 
     const parsedFile = path.parse(filename)
     const newFilename = `${uuidv4()}${parsedFile.ext}`
-    const absPath = `${UPLOADS_DIR}${me.id}`
+    const absPath = `${UPLOADS_DIR}${me.id}/`
     const newFilePath = `${absPath}${newFilename}`
 
     const mediaData = {
@@ -184,7 +182,7 @@ const mutations = {
         .autoOrient()
         .resize(2500, 2500, '>')
         .size((err, size) => {
-          if (!err) return
+          if (err) return
           mediaData.width = size.width
           mediaData.height = size.height
         })
@@ -196,9 +194,7 @@ const mutations = {
 
     const fileInfo = await fsStat(newFilePath)
     mediaData.size = fileInfo.size
-
     const media = await Media.create(mediaData)
-
     await media.addPosts([postId])
 
     return media
@@ -206,15 +202,14 @@ const mutations = {
 
 
   async deleteFile(_, { id }, { me }) {
-    if (!process.env.CREATE_POSTS) throw new Error('Coming soon.')
     const media = await Media.findByPk(id)
     if (!media) throw new ApolloError('No file found')
     if (media.user_id !== me.id) throw new AuthenticationError('No, just no!')
 
-    const filePath = path.resolve(__dirname, '../../../public/uploads/', String(media.user_id), media.filename)
+    const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
 
     await fsUnlink(filePath)
-    await media.destroy()
+    await media.destroy({ force: true })
 
     return id
   },
