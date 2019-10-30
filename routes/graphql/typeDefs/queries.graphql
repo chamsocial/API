@@ -1,7 +1,6 @@
 type Query {
   me: User
   posts(postsPerPage: Int, page: Int, groupId: ID): PostsList!
-  postsInfo: postsInfoType!
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!
   user(slug: String!): User

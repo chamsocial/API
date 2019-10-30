@@ -22,9 +22,6 @@ const queries = {
     })
     return { list: posts }
   },
-  postsInfo: async () => ({
-    count: await Post.count({ where: { status: 'published' } }),
-  }),
   post: (_, { slug }) => (
     Post.findOne({ where: { slug, status: 'published' } })
       .then(post => {
