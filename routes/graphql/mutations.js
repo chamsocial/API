@@ -10,6 +10,7 @@ const {
 } = require('../../models')
 const createUser = require('../../mutators/createUser')
 const updateEmailSubscriptions = require('./mutations/updateEmailSubscriptions')
+const logger = require('../../config/logger')
 
 const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
@@ -17,11 +18,13 @@ const fsUnlink = promisify(fs.unlink)
 
 const { UPLOADS_DIR } = process.env
 
+
 function invalidUserError(title = 'Invalid username or password') {
   const error = new Error(title)
   error.status = 401
   return error
 }
+
 
 const mutations = {
   updateEmailSubscriptions,
@@ -108,7 +111,7 @@ const mutations = {
       post.comments_count += 1
       await post.save()
     } catch (e) {
-      console.error('SAVE_COMMENT', { user_id: me.id, postSlug }, e)
+      logger.error('SAVE_COMMENT', { error: e, user_id: me.id, postSlug })
       throw new Error('Could not save comment')
     }
 
@@ -207,8 +210,13 @@ const mutations = {
     if (media.user_id !== me.id) throw new AuthenticationError('No, just no!')
 
     const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
-
-    await fsUnlink(filePath)
+    try {
+      await fsUnlink(filePath)
+    } catch (err) {
+      logger.error('DELETE_FILE_ERROR', {
+        error: err, filePath, fileId: media.id, userId: me.id,
+      })
+    }
     await media.destroy({ force: true })
 
     return id

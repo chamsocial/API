@@ -8,12 +8,13 @@ const cors = require('kcors')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-body')
-const logger = require('koa-logger')
+const koaLogger = require('koa-logger')
 const staticFiles = require('koa-static')
 
 const auth = require('./routes/auth')
 const middleware = require('./routes/middleware')
 const graphqlRoutes = require('./routes/graphql')
+const logger = require('./config/logger')
 
 const app = new Koa()
 
@@ -31,15 +32,15 @@ app.use(session(SESSION_CONFIG, app))
 // error handler
 onerror(app)
 
-process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason) // eslint-disable-line
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at: Promise', { promise, reason }) // eslint-disable-line
   // application specific logging, throwing an error, or other logic here
 })
 
 // middlewares
 app.use(bodyparser())
 app.use(json())
-if (process.env.NODE_ENV !== 'test') app.use(logger())
+if (process.env.NODE_ENV !== 'test') app.use(koaLogger())
 app.use(staticFiles(path.join(__dirname, '/public')))
 
 app.use(cors({ credentials: true }))
@@ -52,13 +53,13 @@ app.use(async (ctx, next) => {
     const status = ctx.status || 404
     if (status === 404) ctx.throw(404)
   } catch (err) {
-    console.error('*** ERROR ***', err)
+    logger.error('CHAM_EROR', err)
     // will only respond with JSON
     ctx.status = err.statusCode || err.status || 500
     ctx.body = {
-      errors: [{
-        title: err.message,
-      }],
+      error: {
+        message: ctx.status === 500 ? 'Internal server error' : err.message,
+      },
     }
   }
 })
