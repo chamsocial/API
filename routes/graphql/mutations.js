@@ -3,6 +3,7 @@ const path = require('path')
 const { promisify } = require('util')
 const gm = require('gm')
 const uuidv4 = require('uuid/v4')
+const slugify = require('slug')
 const { UserInputError, AuthenticationError, ApolloError } = require('apollo-server-koa')
 const {
   Activation, User, Post, Comment, Media,
@@ -23,6 +24,14 @@ function invalidUserError(title = 'Invalid username or password') {
   const error = new Error(title)
   error.status = 401
   return error
+}
+
+
+async function generateSlug(Model, name) {
+  const slug = slugify(name, { lower: true }).substr(0, 200)
+  const slugExist = await Model.findOne({ where: { slug } })
+  if (slugExist) return `${slug}-${Date.now()}`.substr(0, 200)
+  return slug
 }
 
 
@@ -126,14 +135,15 @@ const mutations = {
     if (status === 'published' && !groupId) {
       throw new UserInputError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
     }
+    const slug = await generateSlug(Post, title)
 
     return Post.create({
       user_id: me.id,
       title,
       content,
       status,
-      slug: uuidv4(), // Create proper slug
-      group_id: 6,
+      slug,
+      group_id: groupId || 0,
     })
   },
   async editPost(_, args, { me }) {
