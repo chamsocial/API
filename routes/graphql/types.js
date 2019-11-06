@@ -2,7 +2,7 @@ const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
 const { AuthenticationError } = require('apollo-server-koa')
 const {
-  User, Comment, Post, GroupContent, MessageSubscriber, Op,
+  User, Comment, Post, GroupContent,
 } = require('../../models')
 
 const types = {
@@ -61,6 +61,11 @@ const types = {
       const users = await loaders.messageThreadUsers.load(messageThread.id)
       return users.filter(user => user.id !== me.id)
     },
+    messages: messageThread => messageThread.Messages,
+  },
+  Message: {
+    createdAt: message => message.created_at || message.createdAt,
+    user: (message, args, { loaders }) => loaders.getUser.load(message.user_id),
   },
 }
 

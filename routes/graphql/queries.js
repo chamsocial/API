@@ -92,6 +92,21 @@ const queries = {
 
     return messages
   },
+  messageThread: async (_, { threadId }, { me }) => {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    const thread = await MessageThread.findOne({
+      where: { id: threadId },
+      include: [{
+        model: MessageSubscriber,
+        where: { user_id: me.id },
+      }, {
+        model: Message,
+      }],
+    })
+
+    return thread
+  },
 }
 
 module.exports = queries

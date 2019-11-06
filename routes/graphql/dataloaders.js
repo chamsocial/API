@@ -1,5 +1,7 @@
 const DataLoader = require('dataloader')
-const { GroupUser, Op, MessageSubscriber, User } = require('../../models')
+const {
+  GroupUser, Op, MessageSubscriber, User, Sequelize,
+} = require('../../models')
 
 const emailSubscriptions = new DataLoader(async ids => {
   const { userId } = ids[0]
@@ -32,7 +34,16 @@ const messageThreadUsers = new DataLoader(async ids => {
 })
 
 
+const getUser = new DataLoader(ids => (
+  User.findAll({
+    where: { id: { [Op.in]: ids } },
+    order: [[Sequelize.fn('FIELD', Sequelize.col('id'), ...ids)]],
+  })
+))
+
+
 module.exports = {
   emailSubscriptions,
   messageThreadUsers,
+  getUser,
 }

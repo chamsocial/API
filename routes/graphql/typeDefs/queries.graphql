@@ -9,4 +9,5 @@ type Query {
   groups: [Group]!
   group(slug: String!): Group!
   messages: [MessageThread]
+  messageThread(threadId: ID!): MessageThread
 }

@@ -20,11 +20,9 @@ module.exports = function MessageModel(sequelize, DataTypes) {
     message: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
   }, {
-    paranoid: true,
     tableName: 'messages',
     underscored: true,
     createdAt: 'created_at',
-    deletedAt: 'deleted_at',
     updatedAt: false,
   })
 

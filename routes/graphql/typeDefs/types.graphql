@@ -91,6 +91,7 @@ type MessageThread {
   seenAt: DateTime
   lastMessageAt: DateTime
   users: [User]
+  messages: [Message]
 }
 
 type Message {
