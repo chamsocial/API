@@ -38,6 +38,14 @@ db.Comment.Comment = db.Comment.hasMany(db.Comment, { foreignKey: 'parent_id' })
 
 db.Activation.User = db.Activation.belongsTo(db.User)
 
+db.Message.Thread = db.MessageThread.hasMany(db.Message, { foreignKey: 'thread_id' })
+db.MessageSubscriber.Thread = db.MessageThread.hasMany(db.MessageSubscriber, { foreignKey: 'thread_id' })
+db.MessageThread.Message = db.Message.belongsTo(db.MessageThread, { foreignKey: 'thread_id' })
+db.MessageThread.MessageSubscriber = db.MessageSubscriber.belongsTo(db.MessageThread, { foreignKey: 'thread_id' })
+
+db.MessageSubscriber.User = db.User.hasMany(db.MessageSubscriber, { foreignKey: 'user_id' })
+db.User.MessageSubscriber = db.MessageSubscriber.belongsTo(db.User, { foreignKey: 'user_id' })
+
 
 db.Post.belongsToMany(db.Media, {
   through: {

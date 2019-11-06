@@ -1,6 +1,7 @@
 const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
 const {
-  Post, User, GroupContent, sequelize,
+  Post, User, GroupContent, sequelize, Sequelize,
+  Message, MessageSubscriber, MessageThread,
 } = require('../../models')
 
 const queries = {
@@ -70,6 +71,27 @@ const queries = {
 
 
   user: (_, { slug }) => User.findOne({ where: { slug } }),
+
+
+  messages: async (_, args, { me }) => {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    const messages = await MessageThread.findAll({
+      include: [{
+        model: Message,
+        where: Sequelize.literal('Messages.created_at = (SELECT MAX(created_at) FROM messages WHERE thread_id = MessageThread.id)'),
+      }, {
+        model: MessageSubscriber,
+        where: { user_id: me.id },
+      }],
+      order: [
+        [Message, 'created_at', 'DESC'],
+      ],
+      // logging: sql => console.log('*** SQL: ', sql),
+    })
+
+    return messages
+  },
 }
 
 module.exports = queries

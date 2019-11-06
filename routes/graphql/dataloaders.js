@@ -1,5 +1,5 @@
 const DataLoader = require('dataloader')
-const { GroupUser, Op } = require('../../models')
+const { GroupUser, Op, MessageSubscriber, User } = require('../../models')
 
 const emailSubscriptions = new DataLoader(async ids => {
   const { userId } = ids[0]
@@ -16,6 +16,23 @@ const emailSubscriptions = new DataLoader(async ids => {
 })
 
 
+const messageThreadUsers = new DataLoader(async ids => {
+  const subscribers = await MessageSubscriber.findAll({
+    where: { thread_id: { [Op.in]: ids } },
+    include: [{
+      model: User,
+    }],
+  })
+
+  return ids.map(threadId => (
+    subscribers
+      .filter(s => s.thread_id === threadId)
+      .map(s => s.User)
+  ))
+})
+
+
 module.exports = {
   emailSubscriptions,
+  messageThreadUsers,
 }

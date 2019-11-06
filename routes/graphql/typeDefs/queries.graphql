@@ -8,4 +8,5 @@ type Query {
   draft(postId: ID!): Post
   groups: [Group]!
   group(slug: String!): Group!
+  messages: [MessageThread]
 }

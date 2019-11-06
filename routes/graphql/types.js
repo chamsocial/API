@@ -2,7 +2,7 @@ const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
 const { AuthenticationError } = require('apollo-server-koa')
 const {
-  User, Comment, Post, GroupContent,
+  User, Comment, Post, GroupContent, MessageSubscriber, Op,
 } = require('../../models')
 
 const types = {
@@ -52,6 +52,14 @@ const types = {
     type: media => {
       if (['image/jpeg', 'image/png', 'image/gif'].includes(media.mime)) return 'image'
       return null
+    },
+  },
+  MessageThread: {
+    lastMessageAt: messageThread => messageThread.Messages[0].created_at,
+    seenAt: messageThread => messageThread.MessageSubscribers[0].seen,
+    users: async (messageThread, args, { me, loaders }) => {
+      const users = await loaders.messageThreadUsers.load(messageThread.id)
+      return users.filter(user => user.id !== me.id)
     },
   },
 }

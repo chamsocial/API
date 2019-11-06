@@ -84,3 +84,20 @@ type Media {
   type: FileType
   url: String!
 }
+
+type MessageThread {
+  id: ID
+  subject: String
+  seenAt: DateTime
+  lastMessageAt: DateTime
+  users: [User]
+}
+
+type Message {
+  id: ID!
+  subject: String
+  message: String
+  seen: DateTime
+  createdAt: DateTime
+  user: User
+}
