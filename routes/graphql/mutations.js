@@ -7,6 +7,7 @@ const slugify = require('slug')
 const { UserInputError, AuthenticationError, ApolloError } = require('apollo-server-koa')
 const {
   Activation, User, Post, Comment, Media,
+  MessageSubscriber, Message,
   Op, sequelize,
 } = require('../../models')
 const createUser = require('../../mutators/createUser')
@@ -230,6 +231,17 @@ const mutations = {
     await media.destroy({ force: true })
 
     return id
+  },
+
+
+  async messageReply(_, { threadId, message }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+    const isSubscriber = await MessageSubscriber.findOne({
+      where: { user_id: me.id, thread_id: threadId },
+    })
+    if (!isSubscriber) throw new AuthenticationError('You don\'t beling to this message thread.')
+
+    return Message.create({ thread_id: threadId, user_id: me.id, message })
   },
 }
 

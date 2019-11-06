@@ -31,4 +31,6 @@ type Mutation {
 
   uploadFile(file: Upload!, postId: ID!): Media!
   deleteFile(id: ID!): ID!
+
+  messageReply(threadId: ID!, message: String!): Message
 }
