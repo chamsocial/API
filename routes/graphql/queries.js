@@ -1,7 +1,7 @@
 const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
 const {
   Post, User, GroupContent, sequelize, Sequelize,
-  Message, MessageSubscriber, MessageThread,
+  Message, MessageSubscriber, MessageThread, Op,
 } = require('../../models')
 
 const queries = {
@@ -71,6 +71,13 @@ const queries = {
 
 
   user: (_, { slug }) => User.findOne({ where: { slug } }),
+  userSearch: (_, { search }) => (
+    User.findAll({
+      where: { username: { [Op.like]: `%${search}%` } },
+      limit: 10,
+      attributes: ['id', 'username'],
+    })
+  ),
 
 
   messages: async (_, args, { me }) => {

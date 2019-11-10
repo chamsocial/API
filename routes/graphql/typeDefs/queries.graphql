@@ -4,6 +4,7 @@ type Query {
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!
   user(slug: String!): User
+  userSearch(search: String!): [User]!
   drafts: [Post]
   draft(postId: ID!): Post
   groups: [Group]!
