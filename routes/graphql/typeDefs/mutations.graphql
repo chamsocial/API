@@ -12,7 +12,7 @@ type Mutation {
   createComment(
     postSlug: String!
     comment: String!
-    parentId: Int
+    parentId: ID
   ): Comment
   createPost(
     title: String!

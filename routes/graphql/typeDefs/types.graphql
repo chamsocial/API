@@ -74,7 +74,7 @@ type Comment {
   id: ID!
   createdAt: DateTime
   content: String
-  parentId: Int
+  parentId: ID
   author: User
   comments: [Comment]
 }
