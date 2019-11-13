@@ -1,6 +1,7 @@
 const { inspect } = require('util')
 const { createLogger, transports, format } = require('winston')
 const { LEVEL, MESSAGE, SPLAT } = require('triple-beam')
+const { Loggly } = require('winston-loggly-bulk')
 
 const { NODE_ENV } = process.env
 
@@ -33,12 +34,12 @@ const logger = createLogger({
 
 
 if (process.env.NODE_ENV === 'production' && process.env.LOGGLY_TOKEN) {
-  logger.add(transports.Loggly, {
+  logger.add(new Loggly({
     inputToken: process.env.LOGGLY_TOKEN,
     subdomain: 'chamsocial',
     tags: ['Cham-NodeJS'],
     json: true,
-  })
+  }))
 }
 
 
