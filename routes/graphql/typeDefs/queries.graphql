@@ -11,4 +11,5 @@ type Query {
   group(slug: String!): Group!
   messages: [MessageThread]
   messageThread(threadId: ID!): MessageThread
+  notifications: [Notification]
 }

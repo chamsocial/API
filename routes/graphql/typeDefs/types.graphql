@@ -11,6 +11,9 @@ enum PostStatus {
 enum FileType {
   image
 }
+enum NotificationType {
+  message
+}
 
 
 # Inputs
@@ -101,4 +104,11 @@ type Message {
   seen: DateTime
   createdAt: DateTime
   user: User
+}
+
+type Notification {
+  id: ID!
+  type: NotificationType
+  typeId: ID
+  title: String
 }

@@ -43,6 +43,9 @@ db.MessageSubscriber.Thread = db.MessageThread.hasMany(db.MessageSubscriber, { f
 db.MessageThread.Message = db.Message.belongsTo(db.MessageThread, { foreignKey: 'thread_id' })
 db.MessageThread.MessageSubscriber = db.MessageSubscriber.belongsTo(db.MessageThread, { foreignKey: 'thread_id' })
 
+db.Message.Subscriber = db.MessageSubscriber.hasMany(db.Message, { foreignKey: 'thread_id', sourceKey: 'thread_id' })
+db.MessageSubscriber.Message = db.Message.hasMany(db.MessageSubscriber, { foreignKey: 'thread_id', sourceKey: 'thread_id' })
+
 db.MessageSubscriber.User = db.User.hasMany(db.MessageSubscriber, { foreignKey: 'user_id' })
 db.User.MessageSubscriber = db.MessageSubscriber.belongsTo(db.User, { foreignKey: 'user_id' })
 

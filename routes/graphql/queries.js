@@ -118,9 +118,44 @@ const queries = {
     if (!thread) throw new ApolloError('No message thread found')
 
     const user = _.get(thread, 'MessageSubscribers[0]')
-    if (user && user.seen === null) await user.update({ seen: new Date() })
+    if (user) await user.update({ seen: new Date() })
 
     return thread
+  },
+
+
+  notifications: async (parent, args, { me }) => {
+    if (!me) return []
+
+    const messages = await MessageThread.findAll({
+      where: {},
+      include: [
+        { model: Message, attributes: [] },
+        {
+          model: MessageSubscriber,
+          where: {
+            user_id: me.id,
+            [Op.and]: {
+              [Op.or]: [
+                sequelize.literal('Messages.created_at > MessageSubscribers.seen'),
+                { seen: null },
+              ],
+            },
+          },
+          attributes: [],
+        },
+      ],
+      group: ['id'],
+    })
+
+    if (messages.length <= 0) return []
+
+    return messages.map(message => ({
+      id: `thread-${message.id}`,
+      type: 'message',
+      typeId: message.id,
+      title: `New message in "${_.truncate(message.subject)}"`,
+    }))
   },
 }
 
