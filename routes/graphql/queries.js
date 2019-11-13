@@ -71,9 +71,12 @@ const queries = {
 
 
   user: (_, { slug }) => User.findOne({ where: { slug } }),
-  userSearch: (_, { search }) => (
+  userSearch: (_, { search }, { me }) => (
     User.findAll({
-      where: { username: { [Op.like]: `%${search}%` } },
+      where: {
+        id: { [Op.ne]: me.id },
+        username: { [Op.like]: `%${search}%` },
+      },
       limit: 10,
       attributes: ['id', 'username'],
     })
