@@ -236,6 +236,16 @@ const mutations = {
 
   async message(_, { users, subject, message }, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
+    const validUsers = (users && users.length > 0)
+    const sendingToSelf = users.find(userId => String(userId) === String(me.id))
+    const validSubject = subject.length > 2
+    const validMessage = message.length > 2
+    if (!validUsers || !validSubject || !validMessage || sendingToSelf) {
+      throw new UserInputError('INVALID_INPUT', {
+        errors: [{ message: 'Subject and message must be minimum of 3 char and min 1 user' }],
+      })
+    }
+
     const thread = await MessageThread.create({ subject })
     await Message.create({ thread_id: thread.id, user_id: me.id, message })
     const subscribers = users.map(userId => ({ thread_id: thread.id, user_id: userId, seen: null }))
