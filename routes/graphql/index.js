@@ -15,10 +15,19 @@ const server = new ApolloServer({
   typeDefs,
   context: ({ ctx }) => ({ loaders, ctx, me: ctx.user }),
   formatError: error => {
-    console.log('GraphQL error:', error.message, error.originalError && error.originalError.stack)
-    if (error.originalError instanceof ApolloError) return new Error(error.originalError.message)
-    if (error.extensions.code === 'INTERNAL_SERVER_ERROR') return new Error('Internal server error')
-    return error
+    const isApolloError = (
+      error.originalError instanceof ApolloError || error instanceof ApolloError
+    )
+
+    console.log('GRAPHQL_ERROR', {
+      message: error.message,
+      stack: error.originalError ? error.originalError.stack : error.stack,
+      query: error.source ? error.source.body : '',
+    })
+
+    return isApolloError
+      ? error
+      : { message: 'Internal server error', code: 'INTERNAL_SERVER_ERROR' }
   },
   uploads: {
     // Limits here should be stricter than config for surrounding
