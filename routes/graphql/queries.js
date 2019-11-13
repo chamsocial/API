@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
 const {
   Post, User, GroupContent, sequelize, Sequelize,
@@ -5,10 +6,10 @@ const {
 } = require('../../models')
 
 const queries = {
-  me: (_, args, { me }) => me,
+  me: (parent, args, { me }) => me,
 
 
-  posts: async (_, { postsPerPage = 20, page = 1, groupId }, context) => {
+  posts: async (parent, { postsPerPage = 20, page = 1, groupId }, context) => {
     const limit = postsPerPage < 100 ? postsPerPage : 100
     const offset = limit * (page - 1)
     const where = { status: 'published' }
@@ -23,20 +24,20 @@ const queries = {
     })
     return { list: posts }
   },
-  post: (_, { slug }) => (
+  post: (parent, { slug }) => (
     Post.findOne({ where: { slug, status: 'published' } })
       .then(post => {
         if (!post) throw new ApolloError('NO_POSTS_FOUND')
         return post
       })
   ),
-  postMedia: async (_, { postId }) => {
+  postMedia: async (parent, { postId }) => {
     const post = await Post.findByPk(postId)
     return post.getMedia()
   },
 
 
-  drafts(_, args, { me }) {
+  drafts(parent, args, { me }) {
     if (!me) throw new AuthenticationError('You must be logged in.')
     return Post.findAll({
       where: { user_id: me.id, status: 'draft' },
@@ -44,7 +45,7 @@ const queries = {
       order: [['created_at', 'DESC']],
     })
   },
-  draft: async (_, { postId }, { me }) => {
+  draft: async (parent, { postId }, { me }) => {
     if (!me) throw new AuthenticationError('You must be logged in.')
     const post = await Post.findOne({ where: { id: postId, user_id: me.id } })
     if (!post) throw new ForbiddenError('No draft exist!')
@@ -67,11 +68,11 @@ const queries = {
     )
     return groups
   },
-  group: (_, { slug }) => GroupContent.findOne({ where: { slug: String(slug) } }),
+  group: (parent, { slug }) => GroupContent.findOne({ where: { slug: String(slug) } }),
 
 
-  user: (_, { slug }) => User.findOne({ where: { slug } }),
-  userSearch: (_, { search }, { me }) => (
+  user: (parent, { slug }) => User.findOne({ where: { slug } }),
+  userSearch: (parent, { search }, { me }) => (
     User.findAll({
       where: {
         id: { [Op.ne]: me.id },
@@ -83,7 +84,7 @@ const queries = {
   ),
 
 
-  messages: async (_, args, { me }) => {
+  messages: async (parent, args, { me }) => {
     if (!me) throw new AuthenticationError('You must be logged in.')
 
     const messages = await MessageThread.findAll({
@@ -102,7 +103,7 @@ const queries = {
 
     return messages
   },
-  messageThread: async (_, { threadId }, { me }) => {
+  messageThread: async (parent, { threadId }, { me }) => {
     if (!me) throw new AuthenticationError('You must be logged in.')
 
     const thread = await MessageThread.findOne({
@@ -114,6 +115,10 @@ const queries = {
         model: Message,
       }],
     })
+    if (!thread) throw new ApolloError('No message thread found')
+
+    const user = _.get(thread, 'MessageSubscribers[0]')
+    if (user && user.seen === null) await user.update({ seen: new Date() })
 
     return thread
   },
