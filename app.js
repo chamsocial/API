@@ -17,6 +17,7 @@ const graphqlRoutes = require('./routes/graphql')
 const logger = require('./config/logger')
 
 const app = new Koa()
+app.proxy = true
 
 app.keys = [process.env.SESSION_SECRET]
 const SESSION_CONFIG = {
