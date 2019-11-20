@@ -13,6 +13,8 @@ const {
 const createUser = require('../../mutators/createUser')
 const updateEmailSubscriptions = require('./mutations/updateEmailSubscriptions')
 const logger = require('../../config/logger')
+const redis = require('../../config/redis')
+const resetPasswordEmail = require('../../emails/resetPassword')
 
 const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
@@ -54,6 +56,32 @@ const mutations = {
     context.ctx.session.user = user.id
     context.me = user
     return user.getPublicData()
+  },
+
+  async forgotPassword(parent, { username }) {
+    if (!username) return false
+
+    const user = await User.findOne({ where: { [Op.or]: [{ username }, { email: username }] } })
+    if (!user) return false
+
+    const token = uuidv4()
+    await redis.set(`forgot:${token}`, user.id)
+    const EXPIRE_IN_SEC = 2 * 24 * 60 * 60
+    await redis.expire(`forgot:${token}`, EXPIRE_IN_SEC)
+
+    await resetPasswordEmail(user, token)
+    return true
+  },
+  async resetPassword(parent, { token, password }) {
+    if (!token || !password || String(password).length > 6) return false
+
+    const userId = await redis.get(`forgot:${token}`)
+    if (!userId) return false
+    const user = await User.findByPk(userId)
+    await user.update({ password })
+    await redis.del(`forgot:${token}`)
+
+    return true
   },
 
   async createUser(_, { username, email, password }, { ctx }) {

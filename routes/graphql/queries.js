@@ -4,9 +4,17 @@ const {
   Post, User, GroupContent, sequelize, Sequelize,
   Message, MessageSubscriber, MessageThread, Op,
 } = require('../../models')
+const redis = require('../../config/redis')
+
 
 const queries = {
   me: (parent, args, { me }) => me,
+  resetPassword: async (parent, { token }) => {
+    const userId = await redis.get(`forgot:${token}`)
+    if (!userId) return null
+    const user = await User.findByPk(userId)
+    return user.username
+  },
 
 
   posts: async (parent, { postsPerPage = 20, page = 1, groupId }, context) => {
