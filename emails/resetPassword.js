@@ -1,5 +1,4 @@
 const mailgun = require('../config/mailgun')
-const logger = require('../config/logger')
 
 
 function sendActivationEmail(user, token) {
@@ -29,5 +28,6 @@ function sendActivationEmail(user, token) {
       throw new Error(`Failed to send email to ${user.get('email')} | ${error.message}`)
     })
 }
+
 
 module.exports = sendActivationEmail
