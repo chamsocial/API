@@ -85,6 +85,9 @@ db.Post.addHook('afterUpdate', (post, options) => {
     triggerEmail('post', post.id)
   }
 })
+db.Message.addHook('afterCreate', message => {
+  triggerEmail('new_pm', message.id)
+})
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
