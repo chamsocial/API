@@ -68,25 +68,25 @@ db.Media.belongsToMany(db.Post, {
 
 
 // Trigger emails
-function triggerEmail(type, id) {
-  redisClient.publish('send_email', JSON.stringify({ command: type, params: { id } }))
+function triggerEmail(type, params) {
+  redisClient.publish('send_email', JSON.stringify({ command: type, params }))
 }
 
 db.Comment.addHook('afterCreate', comment => {
-  triggerEmail('comment', comment.id)
+  triggerEmail('comment', { id: comment.id })
 })
 db.Post.addHook('afterCreate', post => {
   if (post.status === 'published') {
-    triggerEmail('post', post.id)
+    triggerEmail('post', { id: post.id })
   }
 })
 db.Post.addHook('afterUpdate', (post, options) => {
   if (options.fields.includes('status') && post.status === 'published') {
-    triggerEmail('post', post.id)
+    triggerEmail('post', { id: post.id })
   }
 })
 db.Message.addHook('afterCreate', message => {
-  triggerEmail('new_pm', message.id)
+  triggerEmail('new_pm', { message_id: message.id })
 })
 
 db.sequelize = sequelize
