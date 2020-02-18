@@ -72,16 +72,19 @@ const mutations = {
     await resetPasswordEmail(user, token)
     return true
   },
-  async resetPassword(parent, { token, password }) {
-    if (!token || !password || String(password).length > 6) return false
+  async resetPassword(parent, { token, password }, context) {
+    if (!token || !password || String(password).length < 6) return null
 
     const userId = await redis.get(`forgot:${token}`)
-    if (!userId) return false
+    if (!userId) return null
     const user = await User.findByPk(userId)
+    if (!user) return null
     await user.update({ password })
     await redis.del(`forgot:${token}`)
 
-    return true
+    // Login user
+    context.ctx.session.user = user.id
+    return user.getPublicData()
   },
 
   async createUser(_, { username, email, password }, { ctx }) {
