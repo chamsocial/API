@@ -8,7 +8,7 @@ const { UserInputError, AuthenticationError, ApolloError } = require('apollo-ser
 const {
   Activation, User, Post, Comment, Media,
   MessageSubscriber, Message, MessageThread,
-  Op, sequelize,
+  Op,
 } = require('../../models')
 const createUser = require('../../mutators/createUser')
 const updateEmailSubscriptions = require('./mutations/updateEmailSubscriptions')
@@ -79,6 +79,7 @@ const mutations = {
     if (!userId) return null
     const user = await User.findByPk(userId)
     if (!user) return null
+    // Activate if not activated
     await user.update({ password })
     await redis.del(`forgot:${token}`)
 
@@ -88,15 +89,15 @@ const mutations = {
   },
 
   async createUser(_, { username, email, password }, { ctx }) {
-    return createUser({ username, email, password }, ctx.request.ip)
-      .catch(err => {
-        if (err instanceof sequelize.ValidationError) {
-          const errors = err.errors.map(e => ({ message: e.message, path: e.path }))
-          throw new UserInputError('Create user errors', { errors })
-        }
-        // @TODO Log
-        throw new Error('A server error occured please try again later.')
-      })
+    const user = await User.findOne({ where: { [Op.or]: [{ username }, { email }] } })
+    if (user) {
+      const inUse = []
+      if (user.get('username').toLowerCase() === username.toLowerCase()) inUse.push('Username')
+      if (user.get('email').toLowerCase() === email.toLowerCase()) inUse.push('Email')
+      return { success: false, error: { message: `${inUse.join(' and ')} already in use.` } }
+    }
+    await createUser({ username, email, password }, ctx.request.ip)
+    return { success: true }
   },
 
   async activateUser(_, { code }, context) {

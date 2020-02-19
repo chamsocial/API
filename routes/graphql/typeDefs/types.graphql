@@ -16,6 +16,16 @@ enum NotificationType {
 }
 
 
+# Mutaions
+type MutationResponse {
+  success: Boolean!
+  error: Error
+}
+
+type Error {
+  message: String
+}
+
 # Inputs
 
 

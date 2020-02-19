@@ -1,5 +1,6 @@
 const uuidv4 = require('uuid/v4')
 const mailgun = require('../config/mailgun')
+const logger = require('../config/logger')
 const { User, Activation } = require('../models')
 
 function sendEmail(user, activationCode) {
@@ -21,7 +22,7 @@ function sendEmail(user, activationCode) {
   }
 
   return mailgun.messages().send(data, error => {
-    if (error) console.error('Mailgin error:', error)
+    if (error) logger.error('Mailgin error:', error)
   })
 }
 
