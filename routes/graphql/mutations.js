@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
 const gm = require('gm')
-const uuidv4 = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid')
 const slugify = require('slug')
 const { UserInputError, AuthenticationError, ApolloError } = require('apollo-server-koa')
 const {

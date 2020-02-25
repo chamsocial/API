@@ -1,4 +1,4 @@
-const uuidv4 = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid')
 const mailgun = require('../config/mailgun')
 const logger = require('../config/logger')
 const { User, Activation } = require('../models')
