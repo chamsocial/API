@@ -37,7 +37,11 @@ const types = {
     },
     posts: (user, { count = 10 }) => {
       const limit = count >= 1 && count <= 100 ? count : 10
-      return Post.findAll({ where: { user_id: user.id, status: 'published' }, limit })
+      return Post.findAll({
+        where: { user_id: user.id, status: 'published' },
+        order: [['created_at', 'DESC']],
+        limit,
+      })
     },
     avatarUrl: user => gravatar.url(user.email, { s: '100', d: 'identicon' }, true),
   },
