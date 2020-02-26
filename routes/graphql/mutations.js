@@ -4,6 +4,7 @@ const { promisify } = require('util')
 const gm = require('gm')
 const { v4: uuidv4 } = require('uuid')
 const slugify = require('slug')
+const striptags = require('striptags')
 const { UserInputError, AuthenticationError, ApolloError } = require('apollo-server-koa')
 const {
   Activation, User, Post, Comment, Media,
@@ -29,7 +30,7 @@ function invalidUserError(title = 'Invalid username or password') {
   return error
 }
 
-
+function cleanContent(input) { return striptags(input).trim() }
 async function generateSlug(Model, name) {
   const slug = slugify(name, { lower: true }).substr(0, 200)
   const slugExist = await Model.findOne({ where: { slug } })
@@ -118,13 +119,13 @@ const mutations = {
     if (!me) throw new AuthenticationError('You are not authorized to edit this profile.')
 
     const user = await User.findByPk(me.id)
-    user.first_name = fields.firstName
-    user.last_name = fields.lastName
-    user.company_name = fields.companyName
-    user.jobtitle = fields.jobtitle
-    user.interests = fields.interests
-    user.aboutme = fields.aboutme
-    user.lang = fields.lang
+    user.first_name = cleanContent(fields.firstName)
+    user.last_name = cleanContent(fields.lastName)
+    user.company_name = cleanContent(fields.companyName)
+    user.jobtitle = cleanContent(fields.jobtitle)
+    user.interests = cleanContent(fields.interests)
+    user.aboutme = cleanContent(fields.aboutme)
+    user.lang = fields.lang === 'fr' ? 'fr' : 'en'
     await user.save()
     return user
   },
@@ -146,7 +147,7 @@ const mutations = {
       const post = await Post.findOne({ where: { slug: postSlug } })
       newComment = await Comment.create({
         post_id: post.id,
-        content: comment,
+        content: cleanContent(comment),
         user_id: me.id,
         parent_id: parentId,
       })
@@ -172,8 +173,8 @@ const mutations = {
 
     return Post.create({
       user_id: me.id,
-      title,
-      content,
+      title: cleanContent(title),
+      content: cleanContent(content),
       status,
       slug,
       group_id: groupId || 0,
@@ -184,8 +185,8 @@ const mutations = {
     if (!me) throw new AuthenticationError('You must be logged in.')
     if (post.user_id !== me.id) throw new AuthenticationError('You can\'t edit some one else post.')
 
-    post.title = args.title
-    post.content = args.content
+    post.title = cleanContent(args.title)
+    post.content = cleanContent(args.content)
     post.status = args.status
     post.group_id = args.groupId
 
@@ -279,7 +280,7 @@ const mutations = {
     }
 
     const thread = await MessageThread.create({ subject })
-    await Message.create({ thread_id: thread.id, user_id: me.id, message })
+    await Message.create({ thread_id: thread.id, user_id: me.id, message: cleanContent(message) })
     const subscribers = users.map(userId => ({ thread_id: thread.id, user_id: userId, seen: null }))
     subscribers.push({ thread_id: thread.id, user_id: me.id, seen: new Date() })
     await MessageSubscriber.bulkCreate(subscribers)
@@ -293,7 +294,7 @@ const mutations = {
     })
     if (!isSubscriber) throw new AuthenticationError('You don\'t beling to this message thread.')
 
-    return Message.create({ thread_id: threadId, user_id: me.id, message })
+    return Message.create({ thread_id: threadId, user_id: me.id, message: cleanContent(message) })
   },
 }
 
