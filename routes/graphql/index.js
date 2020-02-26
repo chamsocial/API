@@ -34,8 +34,8 @@ const server = new ApolloServer({
     // infrastructure such as Nginx so errors can be handled elegantly by
     // graphql-upload:
     // https://github.com/jaydenseric/graphql-upload#type-uploadoptions
-    maxFileSize: 10000000, // 10 MB
-    maxFiles: 20,
+    maxFileSize: 10485760, // 10 MB
+    maxFiles: 10,
   },
   extensions: [() => new BasicLogging()],
 })

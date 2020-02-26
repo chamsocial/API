@@ -20,7 +20,6 @@
     "dataloader": "^2.0.0",
     "debug": "*",
     "dotenv": "^8.0.0",
-    "gm": "^1.23.1",
     "graphql": "^14.0.2",
     "graphql-iso-date": "^3.6.1",
     "graphql-relay": "^0.6.0",

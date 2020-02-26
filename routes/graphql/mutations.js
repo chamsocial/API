@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { promisify } = require('util')
-const gm = require('gm')
+const sharp = require('sharp')
 const { v4: uuidv4 } = require('uuid')
 const slugify = require('slug')
 const striptags = require('striptags')
@@ -208,6 +208,13 @@ const mutations = {
     // { filename: 'logo.png', mimetype: 'image/png', encoding: '7bit' }
     const { createReadStream, filename, mimetype } = await file
     const stream = createReadStream()
+    const chunks = []
+    await new Promise((resolve, reject) => {
+      stream
+        .on('data', data => chunks.push(data))
+        .on('end', resolve)
+        .on('error', reject)
+    })
 
     const parsedFile = path.parse(filename)
     const newFilename = `${uuidv4()}${parsedFile.ext}`
@@ -221,26 +228,20 @@ const mutations = {
     }
 
     // // Verify or create path
-    await fsStat(absPath).catch(() => fsMkdir(absPath))
+    try {
+      await fsStat(absPath)
+    } catch (e) {
+      await fsMkdir(absPath)
+    }
 
-    // Save the image
-    await new Promise((resolve, reject) => {
-      gm(stream)
-        .autoOrient()
-        .resize(2500, 2500, '>')
-        .size((err, size) => {
-          if (err) return
-          mediaData.width = size.width
-          mediaData.height = size.height
-        })
-        .write(newFilePath, err => {
-          if (err) return reject(err)
-          return resolve()
-        })
-    })
+    const img = await sharp(Buffer.concat(chunks))
+      .resize(2500, 2500, { fit: 'inside', withoutEnlargement: true })
+      .rotate()
+      .toFile(newFilePath)
 
-    const fileInfo = await fsStat(newFilePath)
-    mediaData.size = fileInfo.size
+    mediaData.width = img.width
+    mediaData.height = img.height
+    mediaData.size = img.size
     const media = await Media.create(mediaData)
     await media.addPosts([postId])
 

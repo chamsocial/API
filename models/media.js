@@ -24,10 +24,9 @@ module.exports = function MediaModel(sequelize, DataTypes) {
         return `/uploads/${this.getDataValue('user_id')}/${this.getDataValue('filename')}`
       },
     },
-    paranoid: true,
+    paranoid: false,
     tableName: 'media',
     underscored: true,
-    deletedAt: 'deleted_at',
     updatedAt: false,
   })
 
