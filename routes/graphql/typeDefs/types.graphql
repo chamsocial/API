@@ -71,6 +71,7 @@ type Post {
   author: User
   canEdit: Boolean
   group: Group
+  hasMedia: Boolean
   comments: [Comment]!
 }
 

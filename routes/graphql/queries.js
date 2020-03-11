@@ -22,9 +22,12 @@ const queries = {
     const offset = limit * (page - 1)
     const where = { status: 'published' }
     if (groupId) where.group_id = groupId
+    const attributes = Post.publicFields
+    attributes.push(Post.hasMediaAttribute)
 
     context.postListWhere = where
     const posts = await Post.findAll({
+      attributes,
       where,
       limit,
       offset,

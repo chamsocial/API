@@ -1,6 +1,8 @@
 const showdown = require('showdown')
+const Sequelize = require('sequelize')
 
 const converter = new showdown.Converter()
+
 
 module.exports = function PostModel(sequelize, DataTypes) {
   const Post = sequelize.define('Post', {
@@ -27,6 +29,11 @@ module.exports = function PostModel(sequelize, DataTypes) {
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     title: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     content: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
+    hasMedia: {
+      type: DataTypes.VIRTUAL(DataTypes.BOOLEAN),
+      set(val) { return this.setDataValue('hasMedia', val) },
+      get() { return this.getDataValue('hasMedia') },
+    },
   }, {
     getterMethods: {
       htmlContent() {
@@ -38,14 +45,20 @@ module.exports = function PostModel(sequelize, DataTypes) {
     deletedAt: false,
   })
 
+  Post.hasMediaAttribute = Sequelize.literal(
+    'EXISTS(SELECT id FROM media_relations WHERE media_relations.id = Post.id) AS hasMedia',
+  )
   Post.publicFields = [
     'id',
-    'use_id',
-    'title',
-    'comments_count',
-    'created_at',
+    // 'user_id',
+    'status',
     'slug',
-    'author',
+    // 'group_id',
+    'comments_count',
+    'title',
+    'content',
+    'createdAt',
+    'updatedAt',
   ]
 
   return Post
