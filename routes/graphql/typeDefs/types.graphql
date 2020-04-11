@@ -50,6 +50,7 @@ type User {
   aboutme: String
   jobtitle: String
   avatarUrl: String
+  createdAt: DateTime
   lang: Lang
   bouncing: Boolean
   posts(count: Int): [Post]

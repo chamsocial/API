@@ -43,7 +43,8 @@ const types = {
         limit,
       })
     },
-    avatarUrl: user => gravatar.url(user.email, { s: '100', d: 'identicon' }, true),
+    avatarUrl: user => gravatar.url(user.email, { s: '100', d: 'retro' }, true),
+    createdAt: user => user.created_at || user.createdAt,
   },
   Group: {
     id: group => group.group_id,
