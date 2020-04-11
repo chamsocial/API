@@ -12,7 +12,7 @@ const types = {
     canEdit: (post, args, { me }) => post.user_id === me.id,
     group: async post => GroupContent.findOne({ where: { group_id: post.group_id, lang: 'en' } }),
     author: post => User.findByPk(post.user_id),
-    comments: post => Comment.findAll({ where: { post_id: post.id }, limit: 500 }),
+    comments: post => Comment.findAll({ where: { post_id: post.id, parent_id: null }, limit: 500 }),
   },
   PostsList: {
     totalCount: (post, args, { postListWhere }) => Post.count({ where: postListWhere }),
