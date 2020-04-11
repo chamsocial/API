@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
 const router = require('koa-router')()
@@ -38,7 +39,13 @@ router.get('/img/:h/:w/uploads/:userId/:filename', async ctx => {
   if (Number.isNaN(height) || height < 10 || height > 2000) height = 500
 
   const file = path.resolve(UPLOADS_DIR, userId, filename)
-  ctx.body = sharp(file).resize(width, height)
+  try {
+    await fs.promises.access(file)
+    ctx.body = sharp(file).resize(width, height)
+  } catch (e) {
+    ctx.type = 'image/png'
+    ctx.body = fs.createReadStream(path.resolve(__dirname, '../public/images/missing.png'))
+  }
 })
 
 
