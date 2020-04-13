@@ -27,9 +27,9 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false,
       defaultValue: '',
-      get() {
-        return converter.makeHtml(this.getDataValue('content'))
-      },
+      // get() {
+      //   return converter.makeHtml(this.getDataValue('content'))
+      // },
     },
   }, {
     tableName: 'comments',
