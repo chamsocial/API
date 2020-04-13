@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       allowNull: false,
     },
-    parent_id: { type: DataTypes.INTEGER.UNSIGNED, default: 0 },
+    parent_id: { type: DataTypes.INTEGER.UNSIGNED, default: null },
     email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     content: {

@@ -2,7 +2,7 @@ const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
 const { AuthenticationError } = require('apollo-server-koa')
 const {
-  User, Comment, Post, GroupContent,
+  User, Comment, Post, GroupContent, Op,
 } = require('../../models')
 
 const types = {
@@ -12,7 +12,13 @@ const types = {
     canEdit: (post, args, { me }) => post.user_id === me.id,
     group: async post => GroupContent.findOne({ where: { group_id: post.group_id, lang: 'en' } }),
     author: post => User.findByPk(post.user_id),
-    comments: post => Comment.findAll({ where: { post_id: post.id, parent_id: null }, limit: 500 }),
+    comments: post => Comment.findAll({
+      where: {
+        post_id: post.id,
+        parent_id: { [Op.or]: [null, 0] },
+      },
+      limit: 500,
+    }),
   },
   PostsList: {
     totalCount: (post, args, { postListWhere }) => Post.count({ where: postListWhere }),
