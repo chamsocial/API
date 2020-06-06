@@ -15,7 +15,7 @@
     "ext": "js, mjs, json, graphql"
   },
   "dependencies": {
-    "apollo-server-koa": "^2.1.0",
+    "apollo-server-koa": "^2.14.2",
     "bcryptjs": "^2.4.3",
     "dataloader": "^2.0.0",
     "debug": "*",
