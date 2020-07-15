@@ -1,8 +1,4 @@
-const showdown = require('showdown')
-
-const converter = new showdown.Converter()
-
-module.exports = function (sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   const Comment = sequelize.define('Comment', {
     post_id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -27,9 +23,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: false,
       defaultValue: '',
-      // get() {
-      //   return converter.makeHtml(this.getDataValue('content'))
-      // },
     },
   }, {
     tableName: 'comments',
