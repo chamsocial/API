@@ -60,8 +60,8 @@ async function missingImage(ctx, next) {
     logger.error('THUMBNAIL_FAILED', e)
     if (ctx.get('X-NginX-Proxy')) {
       ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
-      ctx.set('X-I-ChamSocial', 'Hello2')
-      ctx.body = 'Ok'
+      ctx.set('Content-Type', 'image/png')
+      ctx.body = 'OK'
     } else {
       ctx.type = 'image/png'
       ctx.body = fs.createReadStream(path.resolve(__dirname, '../public/images/missing.png'))
@@ -96,15 +96,18 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
     await fs.promises.mkdir(absThumbPath, { recursive: true })
   }
 
-  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', relThumbPath, cleanFilename))
-
-  if (ctx.get('X-NginX-Proxy')) {
-    const absThumbFile = path.join(absThumbPath, cleanFilename)
-    await sharp(file).resize(width, height).toFile(absThumbFile)
-    ctx.body = ''
-  } else {
+  // Local development
+  if (!ctx.get('X-NginX-Proxy')) {
     ctx.body = sharp(file).resize(width, height)
+    return
   }
+
+  const absThumbFile = path.join(absThumbPath, cleanFilename)
+  await sharp(file).resize(width, height).toFile(absThumbFile)
+
+  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', relThumbPath, cleanFilename))
+  ctx.set('Content-Type', mime)
+  ctx.body = 'OK'
 })
 
 // router.get('/thumb/*', async ctx => {
