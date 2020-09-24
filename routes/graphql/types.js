@@ -64,6 +64,7 @@ const types = {
       if (['image/jpeg', 'image/png', 'image/gif'].includes(media.mime)) return 'image'
       return null
     },
+    userId: media => media.user_id,
   },
   MessageThread: {
     lastMessageAt: messageThread => messageThread.Messages[0].created_at,

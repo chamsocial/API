@@ -96,6 +96,8 @@ type Comment {
 
 type Media {
   id: ID!
+  userId: ID
+  filename: String
   type: FileType
   url: String!
 }
