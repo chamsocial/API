@@ -107,11 +107,11 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   }
 })
 
-router.get('/thumb/*', async ctx => {
-  ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
-  ctx.set('X-I-ChamSocial', 'Hello')
-  ctx.body = 'Ok'
-})
+// router.get('/thumb/*', async ctx => {
+//   ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
+//   ctx.set('X-I-ChamSocial', 'Hello')
+//   ctx.body = 'Ok'
+// })
 
 
 module.exports = router
