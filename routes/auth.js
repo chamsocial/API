@@ -3,6 +3,8 @@ const path = require('path')
 const sharp = require('sharp')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
+const logger = require('../config/logger')
+
 
 const { UPLOADS_DIR } = process.env
 
@@ -55,14 +57,12 @@ async function missingImage(ctx, next) {
   try {
     await next()
   } catch (e) {
-    console.log('THUMBNAIL_FAILED', e)
+    logger.error('THUMBNAIL_FAILED', e)
     if (ctx.get('X-NginX-Proxy')) {
-      console.log('404 Yes')
       ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
-      ctx.status = 200
+      ctx.set('X-I-ChamSocial', 'Hello2')
       ctx.body = 'Ok'
     } else {
-      console.log('404 no')
       ctx.type = 'image/png'
       ctx.body = fs.createReadStream(path.resolve(__dirname, '../public/images/missing.png'))
     }
@@ -72,7 +72,6 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   const {
     w, h, userId, filename,
   } = ctx.params
-  const { useAbs } = ctx.request.query
   const cleanFilename = sanitizeFilename(filename)
   const ext = path.extname(cleanFilename).replace('.', '').toLowerCase()
   const mime = mimes[ext]
@@ -97,21 +96,21 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
     await fs.promises.mkdir(absThumbPath, { recursive: true })
   }
 
-  console.log('Hello image')
+  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', relThumbPath, cleanFilename))
 
-  const absThumbFile = path.join(absThumbPath, cleanFilename)
-  const thumbUrl = path.join(relThumbPath, cleanFilename)
-  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', thumbUrl))
-
-  console.log('Headers', ctx.headers)
   if (ctx.get('X-NginX-Proxy')) {
-    console.log('Yes')
+    const absThumbFile = path.join(absThumbPath, cleanFilename)
     await sharp(file).resize(width, height).toFile(absThumbFile)
     ctx.body = ''
   } else {
-    console.log('No')
     ctx.body = sharp(file).resize(width, height)
   }
+})
+
+router.get('/thumb/*', async ctx => {
+  ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
+  ctx.set('X-I-ChamSocial', 'Hello')
+  ctx.body = 'Ok'
 })
 
 
