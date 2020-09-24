@@ -58,10 +58,9 @@ async function missingImage(ctx, next) {
     console.log('THUMBNAIL_FAILED', e)
     if (ctx.get('X-NginX-Proxy')) {
       console.log('404 Yes')
-      const missingPath = path.join(process.env.THUMBNAIL_DIR, '../missing.png')
-      ctx.set('X-Accel-Redirect', missingPath)
+      ctx.set('X-Accel-Redirect', '/secret-media/missing.png')
       ctx.status = 200
-      ctx.body = ''
+      ctx.body = 'Ok'
     } else {
       console.log('404 no')
       ctx.type = 'image/png'
@@ -102,7 +101,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
 
   const absThumbFile = path.join(absThumbPath, cleanFilename)
   const thumbUrl = path.join(relThumbPath, cleanFilename)
-  ctx.set('X-Accel-Redirect', useAbs ? absThumbFile : thumbUrl)
+  ctx.set('X-Accel-Redirect', path.join('/secret-media', thumbUrl))
 
   console.log('Headers', ctx.headers)
   if (ctx.get('X-NginX-Proxy')) {
