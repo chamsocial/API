@@ -101,7 +101,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
 
   const absThumbFile = path.join(absThumbPath, cleanFilename)
   const thumbUrl = path.join(relThumbPath, cleanFilename)
-  ctx.set('X-Accel-Redirect', path.join('/secret-media', thumbUrl))
+  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', thumbUrl))
 
   console.log('Headers', ctx.headers)
   if (ctx.get('X-NginX-Proxy')) {
