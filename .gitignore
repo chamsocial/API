@@ -35,3 +35,4 @@ npm-debug.log
 /tmp
 /public/uploads/**
 !/public/uploads/.gitkeep
+/public/thumbs
