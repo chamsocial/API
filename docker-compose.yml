@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   mysql_cham_container:
+    restart: always
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -9,6 +10,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
   redis:
+    restart: always
     image: redis:5
     ports:
      - 26379:6379
