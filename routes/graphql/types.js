@@ -1,11 +1,13 @@
 const { GraphQLDateTime } = require('graphql-iso-date')
 const gravatar = require('gravatar')
 const { AuthenticationError } = require('apollo-server-koa')
+const { GraphQLUpload } = require('graphql-upload')
 const {
   User, Comment, Post, GroupContent, Op,
 } = require('../../models')
 
 const types = {
+  Upload: GraphQLUpload,
   DateTime: GraphQLDateTime,
   Post: {
     commentsCount: post => post.comments_count,
