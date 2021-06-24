@@ -17,11 +17,20 @@ const queries = {
   },
 
 
-  posts: async (parent, { postsPerPage = 20, page = 1, groupId }, context) => {
+  posts: async (parent, {
+    postsPerPage = 20, page = 1, groupId, search,
+  }, context) => {
     const limit = postsPerPage < 100 ? postsPerPage : 100
     const offset = limit * (page - 1)
     const where = { status: 'published' }
     if (groupId) where.group_id = groupId
+    if (search) {
+      const escaped = sequelize.escape(search)
+      where[Op.and] = sequelize.literal(`MATCH (title,content) AGAINST (${escaped})`)
+      where.created_at = {
+        [Op.gte]: Sequelize.literal('DATE_SUB(NOW(), INTERVAL 5 YEAR)'),
+      }
+    }
     const attributes = Post.publicFields
     attributes.push(Post.hasMediaAttribute)
 
@@ -32,6 +41,7 @@ const queries = {
       limit,
       offset,
       order: [['created_at', 'DESC']],
+      // logging: console.log,
     })
     return { list: posts }
   },

@@ -1,7 +1,7 @@
 type Query {
   me: User
   resetPassword(token: String!): String
-  posts(postsPerPage: Int, page: Int, groupId: ID): PostsList!
+  posts(postsPerPage: Int, page: Int, groupId: ID, search: String): PostsList!
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!
   user(slug: String!): User
