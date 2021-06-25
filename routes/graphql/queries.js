@@ -32,6 +32,7 @@ const queries = {
       }
     }
     const attributes = Post.publicFields
+    attributes.push('user_id', 'group_id')
     attributes.push(Post.hasMediaAttribute)
 
     context.postListWhere = where
