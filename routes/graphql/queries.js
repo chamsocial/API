@@ -179,6 +179,21 @@ const queries = {
       title: `New message in "${_.truncate(message.subject)}"`,
     }))
   },
+
+  bookmarks: async (parent, args, { me }) => {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    const bookmarks = await Post.findAll({
+      include: {
+        model: User,
+        as: 'bookmark',
+        where: { id: me.id },
+        attributes: [],
+      },
+      limit: 200,
+    })
+    return bookmarks
+  },
 }
 
 module.exports = queries

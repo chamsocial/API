@@ -4,6 +4,7 @@ const sharp = require('sharp')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
 const logger = require('../config/logger')
+const { Post, User } = require('../models')
 
 
 const { UPLOADS_DIR } = process.env

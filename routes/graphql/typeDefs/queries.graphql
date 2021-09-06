@@ -13,4 +13,5 @@ type Query {
   messages: [MessageThread]
   messageThread(threadId: ID!): MessageThread
   notifications: [Notification]
+  bookmarks: [Post]!
 }
