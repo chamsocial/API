@@ -53,6 +53,15 @@ const postMutations = {
       .update({ status: 'deleted' }, { where: { id, user_id: me.id } })
       .then(() => true)
   },
+
+  async toggleBookmark(_, { postId, bookmarked }, { me }) {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    if (bookmarked) await me.addBookmark(postId)
+    else await me.removeBookmark(postId)
+
+    return bookmarked
+  },
 }
 
 
