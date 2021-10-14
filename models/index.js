@@ -50,7 +50,7 @@ db.MessageSubscriber.Message = db.Message.hasMany(db.MessageSubscriber, { foreig
 db.MessageSubscriber.User = db.User.hasMany(db.MessageSubscriber, { foreignKey: 'user_id' })
 db.User.MessageSubscriber = db.MessageSubscriber.belongsTo(db.User, { foreignKey: 'user_id' })
 
-// Favorites
+// Bookmarks
 db.User.belongsToMany(db.Post, { through: 'bookmarks', as: 'bookmark' })
 db.Post.belongsToMany(db.User, { through: 'bookmarks', as: 'bookmark' })
 
