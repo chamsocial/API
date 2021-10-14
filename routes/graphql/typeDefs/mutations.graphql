@@ -11,11 +11,13 @@ type Mutation {
   ): User
   updateEmailSubscriptions(settings: [EmailSubscriptionInput!]!): Boolean
   unbounceUser: User
+
   createComment(
     postSlug: String!
     comment: String!
     parentId: ID
   ): Comment
+
   createPost(
     title: String!
     content: String!
@@ -30,6 +32,7 @@ type Mutation {
     groupId: ID
   ): Post
   deletePost(id: ID!): Boolean
+  toggleBookmark(postId: ID!, bookmarked: Boolean!): Boolean
 
   uploadFile(file: Upload!, postId: ID!): Media!
   deleteFile(id: ID!): ID!

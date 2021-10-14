@@ -179,6 +179,42 @@ const queries = {
       title: `New message in "${_.truncate(message.subject)}"`,
     }))
   },
+
+  bookmarks: async (parent, args, { me }) => {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    const bookmarks = await Post.findAll({
+      include: {
+        model: User,
+        as: 'bookmark',
+        where: { id: me.id },
+        attributes: [],
+      },
+      limit: 200,
+    })
+    return bookmarks
+  },
+
+  postsCommented: async (parent, args, { me }) => {
+    if (!me) throw new AuthenticationError('You must be logged in.')
+
+    const commentPosts = await sequelize.query(`
+      SELECT
+        posts.id, posts.user_id, posts.slug, posts.group_id, posts.comments_count, posts.title,
+        posts.created_at AS createdAt,
+        EXISTS(SELECT id FROM media_relations WHERE media_relations.id = posts.id) AS hasMedia,
+        COUNT(posts.id) AS commentsMade
+      FROM posts
+      JOIN comments ON comments.post_id = posts.id
+      WHERE comments.user_id = 3506
+      AND posts.status = 'published'
+      GROUP BY posts.id
+      ORDER BY posts.id DESC
+      LIMIT 200
+    `, { type: sequelize.QueryTypes.SELECT })
+
+    return commentPosts
+  },
 }
 
 module.exports = queries

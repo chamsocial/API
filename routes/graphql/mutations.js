@@ -26,6 +26,7 @@ const mutations = {
   deletePost: posts.deletePost,
   createPost: posts.createPost,
   editPost: posts.editPost,
+  toggleBookmark: posts.toggleBookmark,
 
   // Comments
   createComment: comments.createComment,

@@ -4,7 +4,7 @@ const Sequelize = require('sequelize')
 
 const basename = path.basename(module.filename)
 const env = process.env.NODE_ENV || 'development'
-const config = require('../config/db.js')[env]
+const config = require('../config/db')[env]
 const redisClient = require('../config/redis')
 
 const db = {}
@@ -49,6 +49,10 @@ db.MessageSubscriber.Message = db.Message.hasMany(db.MessageSubscriber, { foreig
 
 db.MessageSubscriber.User = db.User.hasMany(db.MessageSubscriber, { foreignKey: 'user_id' })
 db.User.MessageSubscriber = db.MessageSubscriber.belongsTo(db.User, { foreignKey: 'user_id' })
+
+// Bookmarks
+db.User.belongsToMany(db.Post, { through: 'bookmarks', as: 'bookmark' })
+db.Post.belongsToMany(db.User, { through: 'bookmarks', as: 'bookmark' })
 
 
 db.Post.belongsToMany(db.Media, {

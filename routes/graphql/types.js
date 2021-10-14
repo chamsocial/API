@@ -21,6 +21,11 @@ const types = {
       },
       limit: 500,
     }),
+    bookmarkedAt: async (post, args, { me, loaders }) => {
+      if (!me) return null
+      const bookmarkedAt = await loaders.getBookmarkedAt.load({ postId: post.id, userId: me.id })
+      return bookmarkedAt
+    },
   },
   PostsList: {
     totalCount: (post, args, { postListWhere }) => Post.count({ where: postListWhere }),

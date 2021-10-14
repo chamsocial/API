@@ -1,6 +1,6 @@
 const DataLoader = require('dataloader')
 const {
-  GroupUser, Op, MessageSubscriber, User, Sequelize,
+  GroupUser, Op, MessageSubscriber, User, Sequelize, sequelize,
 } = require('../../models')
 
 const emailSubscriptions = new DataLoader(async ids => {
@@ -41,9 +41,27 @@ const getUser = new DataLoader(ids => (
   })
 ))
 
+const getBookmarkedAt = new DataLoader(async ids => {
+  const postIds = ids.map(id => id.postId)
+  const { userId } = ids[0]
+  const dates = await sequelize.query(
+    'SELECT post_id, created_at FROM bookmarks WHERE user_id = :userId AND post_id IN(:postIds)',
+    {
+      replacements: { userId, postIds },
+      type: sequelize.QueryTypes.SELECT,
+    },
+  )
+  const results = ids.map(({ postId }) => {
+    const date = dates.find(d => d.post_id === postId)
+    return date ? date.created_at : null
+  })
+  return results
+})
+
 
 module.exports = {
   emailSubscriptions,
   messageThreadUsers,
+  getBookmarkedAt,
   getUser,
 }
