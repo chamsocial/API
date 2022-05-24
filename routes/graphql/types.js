@@ -1,4 +1,4 @@
-const { GraphQLDateTime } = require('graphql-iso-date')
+const { GraphQLDateTime } = require('graphql-scalars')
 const gravatar = require('gravatar')
 const { AuthenticationError } = require('apollo-server-koa')
 const { GraphQLUpload } = require('graphql-upload')
