@@ -57,7 +57,7 @@
     "eslint-plugin-import": "^2.25.2",
     "factory-girl": "^5.0.0",
     "mocha": "^9.1.2",
-    "nodemon": "^2.0.13",
+    "nodemon": "^2.0.20",
     "sqlite3": "^5.0.2",
     "supertest": "^6.1.6"
   }
