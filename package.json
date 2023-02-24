@@ -40,7 +40,7 @@
     "mailgun-js": "^0.22.0",
     "mysql2": "^2.3.0",
     "sanitize-filename": "^1.6.3",
-    "sequelize": "^6.7.0",
+    "sequelize": "^6.29.0",
     "sharp": "^0.28.3",
     "showdown": "^1.7.1",
     "slug": "^5.1.0",
