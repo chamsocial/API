@@ -1,7 +1,7 @@
 const { GraphQLDateTime } = require('graphql-scalars')
 const gravatar = require('gravatar')
-const { AuthenticationError } = require('apollo-server-koa')
-const { GraphQLUpload } = require('graphql-upload')
+const { GraphQLError } = require('@apollo/server')
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const {
   User, Comment, Post, GroupContent, Op,
 } = require('../../models')
@@ -62,7 +62,7 @@ const types = {
   Group: {
     id: group => group.group_id,
     subscription: (group, args, { me, loaders }) => {
-      if (!me) throw new AuthenticationError('You must be logged in.')
+      if (!me) throw new GraphQLError('You must be logged in.')
       return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
     },
   },

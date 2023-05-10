@@ -13,7 +13,6 @@ const staticFiles = require('koa-static')
 
 const auth = require('./routes/auth')
 const middleware = require('./routes/middleware')
-const graphqlRoutes = require('./routes/graphql')
 const logger = require('./config/logger')
 
 const app = new Koa()
@@ -67,6 +66,5 @@ app.use(async (ctx, next) => {
 
 // routes
 app.use(auth.routes(), auth.allowedMethods())
-graphqlRoutes(app)
 
 module.exports = app

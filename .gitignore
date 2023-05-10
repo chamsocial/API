@@ -37,3 +37,4 @@ npm-debug.log
 !/public/uploads/.gitkeep
 /public/thumbs
 /.dccache
+/data

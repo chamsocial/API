@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-const { AuthenticationError } = require('apollo-server-koa')
+const { GraphQLError } = require('@apollo/server')
 const { Activation, User, Op } = require('../../../models')
 const createUser = require('../../../mutators/createUser')
 const redis = require('../../../config/redis')
@@ -90,7 +90,7 @@ const auth = {
   },
 
   async updateUser(_, fields, { me }) {
-    if (!me) throw new AuthenticationError('You are not authorized to edit this profile.')
+    if (!me) throw new GraphQLError('You are not authorized to edit this profile.')
 
     const user = await User.findByPk(me.id)
     user.first_name = cleanContent(fields.firstName)
@@ -105,7 +105,7 @@ const auth = {
   },
 
   async unbounceUser(_, fields, { me }) {
-    if (!me) throw new AuthenticationError('You are not authorized.')
+    if (!me) throw new GraphQLError('You are not authorized.')
     const user = await User.findByPk(me.id)
     user.bouncing = 0
     await user.save()

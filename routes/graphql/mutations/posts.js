@@ -1,5 +1,5 @@
 const slugify = require('slug')
-const { UserInputError, AuthenticationError } = require('apollo-server-koa')
+const { GraphQLError } = require('@apollo/server')
 const { Post } = require('../../../models')
 const { cleanContent } = require('../../../utils/content')
 
@@ -16,9 +16,9 @@ const postMutations = {
   async createPost(_, {
     title, content, status, groupId,
   }, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
     if (status === 'published' && !groupId) {
-      throw new UserInputError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
+      throw new GraphQLError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
     }
     const slug = await generateSlug(Post, title)
 
@@ -34,8 +34,8 @@ const postMutations = {
 
   async editPost(_, args, { me }) {
     const post = await Post.findByPk(args.id)
-    if (!me) throw new AuthenticationError('You must be logged in.')
-    if (post.user_id !== me.id) throw new AuthenticationError('You can\'t edit some one else post.')
+    if (!me) throw new GraphQLError('You must be logged in.')
+    if (post.user_id !== me.id) throw new GraphQLError('You can\'t edit some one else post.')
 
     post.title = cleanContent(args.title)
     post.content = cleanContent(args.content)
@@ -48,14 +48,14 @@ const postMutations = {
 
   // @TODO remove media
   deletePost(_, { id }, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
     return Post
       .update({ status: 'deleted' }, { where: { id, user_id: me.id } })
       .then(() => true)
   },
 
   async toggleBookmark(_, { postId, bookmarked }, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
 
     if (bookmarked) await me.addBookmark(postId)
     else await me.removeBookmark(postId)

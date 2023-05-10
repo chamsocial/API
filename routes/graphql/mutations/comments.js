@@ -1,4 +1,4 @@
-const { UserInputError, AuthenticationError } = require('apollo-server-koa')
+const { GraphQLError } = require('@apollo/server')
 const { Post, Comment } = require('../../../models')
 const logger = require('../../../config/logger')
 const { cleanContent } = require('../../../utils/content')
@@ -6,8 +6,8 @@ const { cleanContent } = require('../../../utils/content')
 
 const commentMutations = {
   async createComment(_, { postSlug, comment, parentId }, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
-    if (comment.length < 3) throw new UserInputError('Comment error', { errors: [{ message: 'To short' }] })
+    if (!me) throw new GraphQLError('You must be logged in.')
+    if (comment.length < 3) throw new GraphQLError('Comment error', { errors: [{ message: 'To short' }] })
     let newComment
 
     try {
