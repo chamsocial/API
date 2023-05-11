@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const {
   Post, User, GroupContent, sequelize, Sequelize,
   Message, MessageSubscriber, MessageThread, Op,

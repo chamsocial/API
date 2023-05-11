@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { Activation, User, Op } = require('../../../models')
 const createUser = require('../../../mutators/createUser')
 const redis = require('../../../config/redis')
@@ -8,7 +8,7 @@ const { cleanContent } = require('../../../utils/content')
 
 
 function invalidUserError(title = 'Invalid username or password') {
-  const error = new Error(title)
+  const error = new GraphQLError(title)
   error.status = 401
   return error
 }

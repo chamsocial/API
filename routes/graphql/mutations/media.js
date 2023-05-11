@@ -3,7 +3,7 @@ const path = require('path')
 const { promisify } = require('util')
 const sharp = require('sharp')
 const { v4: uuidv4 } = require('uuid')
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { Media } = require('../../../models')
 const logger = require('../../../config/logger')
 

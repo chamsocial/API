@@ -1,6 +1,6 @@
 const { GraphQLDateTime } = require('graphql-scalars')
 const gravatar = require('gravatar')
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const {
   User, Comment, Post, GroupContent, Op,

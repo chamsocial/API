@@ -1,5 +1,5 @@
 const slugify = require('slug')
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { Post } = require('../../../models')
 const { cleanContent } = require('../../../utils/content')
 

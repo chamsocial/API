@@ -1,4 +1,4 @@
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { MessageSubscriber, Message, MessageThread } = require('../../../models')
 const { cleanContent } = require('../../../utils/content')
 

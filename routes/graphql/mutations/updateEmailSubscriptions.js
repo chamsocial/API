@@ -1,4 +1,4 @@
-const { GraphQLError } = require('@apollo/server')
+const { GraphQLError } = require('graphql')
 const { GroupUser } = require('../../../models')
 
 
