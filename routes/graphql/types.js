@@ -1,6 +1,7 @@
 const { GraphQLDateTime } = require('graphql-scalars')
 const gravatar = require('gravatar')
 const { GraphQLError } = require('graphql')
+// eslint-disable-next-line import/extensions
 const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const {
   User, Comment, Post, GroupContent, Op,

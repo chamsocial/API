@@ -7,6 +7,7 @@ const client = new Redis(port, host)
 // Prevent from crashing the app?
 client.on('error', err => {
   console.log(`Redis error API: ${err}`)
+  throw err
 })
 
 module.exports = client
