@@ -8,9 +8,7 @@ const typeDefs = require('./typeDefs')
 const loaders = require('./dataloaders')
 
 
-async function startServer(app) {
-  const httpServer = app
-
+async function startServer(httpServer, app) {
   const server = new ApolloServer({
     resolvers,
     typeDefs,

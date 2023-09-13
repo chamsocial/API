@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+const http = require('http')
 const app = require('../app')
 const graphqlServer = require('../routes/graphql')
 
@@ -20,14 +21,19 @@ const port = normalizePort(process.env.PORT || '7440')
 
 
 async function main() {
-  await graphqlServer(app)
+  const httpServer = http.createServer(app.callback())
 
-  await new Promise((res, rej) => {
-    const s = app.listen(port, err => (err ? rej(err) : res(s)))
-  })
+  await graphqlServer(httpServer, app)
+
+  await new Promise(resolve => { httpServer.listen({ port }, resolve) })
 
   console.log(' ⚡️ Express running on port:', port)
 }
+
+
+// * TypeError: this.server.close is not a function
+// * Replace depricated mailgin
+// * Log send activation/reset_password email to stats_sent_emails { type, typeId, receivers }
 
 
 main()
