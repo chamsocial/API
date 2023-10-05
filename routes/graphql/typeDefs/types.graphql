@@ -129,3 +129,14 @@ type Notification {
   typeId: ID
   title: String
 }
+
+
+type BlogPost {
+  id: ID!
+  title: String!
+  slug: String!
+  markdown: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  author: User
+}

@@ -87,6 +87,9 @@ const types = {
     createdAt: message => message.created_at || message.createdAt,
     user: (message, args, { loaders }) => loaders.getUser.load(message.user_id),
   },
+  BlogPost: {
+    author: (blogPost, args, { loaders }) => loaders.getUser.load(blogPost.author_id),
+  },
 }
 
 module.exports = types

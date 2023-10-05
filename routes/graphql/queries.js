@@ -2,7 +2,7 @@ const _ = require('lodash')
 const { GraphQLError } = require('graphql')
 const {
   Post, User, GroupContent, sequelize, Sequelize,
-  Message, MessageSubscriber, MessageThread, Op,
+  Message, MessageSubscriber, MessageThread, Blog, Op,
 } = require('../../models')
 const redis = require('../../config/redis')
 
@@ -214,6 +214,20 @@ const queries = {
     `, { type: sequelize.QueryTypes.SELECT })
 
     return commentPosts
+  },
+
+  blog: async () => {
+    const blogPosts = Blog.findAll({
+      where: { status: 'published' },
+      order: [['created_at', 'DESC']],
+      limit: 100,
+    })
+    return blogPosts
+  },
+  blogPost: async (parent, { slug }) => {
+    const blogPost = await Blog.findOne({ where: { slug, status: 'published' } })
+    if (!blogPost) throw new GraphQLError('No blog post found')
+    return blogPost
   },
 }
 

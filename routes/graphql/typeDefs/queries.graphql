@@ -1,18 +1,24 @@
 type Query {
   me: User
+  user(slug: String!): User
+  userSearch(search: String!): [User]!
   resetPassword(token: String!): String
+  notifications: [Notification]
+  bookmarks: [Post]!
+  # Posts
   posts(postsPerPage: Int, page: Int, groupId: ID, search: String): PostsList!
   post(slug: String!): Post
   postMedia(postId: ID!): [Media]!
-  user(slug: String!): User
-  userSearch(search: String!): [User]!
+  postsCommented: [Post]!
   drafts: [Post]
   draft(postId: ID!): Post
+  # Groups
   groups: [Group]!
   group(slug: String!): Group!
+  # Messages
   messages: [MessageThread]
   messageThread(threadId: ID!): MessageThread
-  notifications: [Notification]
-  bookmarks: [Post]!
-  postsCommented: [Post]!
+  # Blog
+  blog: [BlogPost]!
+  blogPost(slug: String!): BlogPost!
 }
