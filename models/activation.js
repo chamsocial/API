@@ -1,4 +1,4 @@
-module.exports = function (sequelize, DataTypes) {
+module.exports = function ActivationModel(sequelize, DataTypes) {
   const Activation = sequelize.define('Activation', {
     user_id: {
       type: DataTypes.INTEGER.UNSIGNED,

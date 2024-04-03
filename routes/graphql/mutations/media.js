@@ -3,7 +3,7 @@ const path = require('path')
 const { promisify } = require('util')
 const sharp = require('sharp')
 const { v4: uuidv4 } = require('uuid')
-const { AuthenticationError, ApolloError } = require('apollo-server-koa')
+const { GraphQLError } = require('graphql')
 const { Media } = require('../../../models')
 const logger = require('../../../config/logger')
 
@@ -16,7 +16,7 @@ const { UPLOADS_DIR } = process.env
 
 const mediaMutations = {
   async uploadFile(parent, { file, postId }, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
     // { filename: 'logo.png', mimetype: 'image/png', encoding: '7bit' }
     const { createReadStream, filename, mimetype } = await file
     const stream = createReadStream()
@@ -62,8 +62,8 @@ const mediaMutations = {
 
   async deleteFile(_, { id }, { me }) {
     const media = await Media.findByPk(id)
-    if (!media) throw new ApolloError('No file found')
-    if (media.user_id !== me.id) throw new AuthenticationError('No, just no!')
+    if (!media) throw new GraphQLError('No file found')
+    if (media.user_id !== me.id) throw new GraphQLError('No, just no!')
 
     const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
     try {

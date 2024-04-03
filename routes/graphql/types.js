@@ -1,7 +1,8 @@
 const { GraphQLDateTime } = require('graphql-scalars')
 const gravatar = require('gravatar')
-const { AuthenticationError } = require('apollo-server-koa')
-const { GraphQLUpload } = require('graphql-upload')
+const { GraphQLError } = require('graphql')
+// eslint-disable-next-line import/extensions
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const {
   User, Comment, Post, GroupContent, Op,
 } = require('../../models')
@@ -62,7 +63,7 @@ const types = {
   Group: {
     id: group => group.group_id,
     subscription: (group, args, { me, loaders }) => {
-      if (!me) throw new AuthenticationError('You must be logged in.')
+      if (!me) throw new GraphQLError('You must be logged in.')
       return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
     },
   },
@@ -85,6 +86,9 @@ const types = {
   Message: {
     createdAt: message => message.created_at || message.createdAt,
     user: (message, args, { loaders }) => loaders.getUser.load(message.user_id),
+  },
+  BlogPost: {
+    author: (blogPost, args, { loaders }) => loaders.getUser.load(blogPost.author_id),
   },
 }
 

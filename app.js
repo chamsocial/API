@@ -7,13 +7,12 @@ const session = require('koa-session')
 const cors = require('kcors')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
-const bodyparser = require('koa-body')
+const { koaBody } = require('koa-body')
 const koaLogger = require('koa-logger')
 const staticFiles = require('koa-static')
 
 const auth = require('./routes/auth')
 const middleware = require('./routes/middleware')
-const graphqlRoutes = require('./routes/graphql')
 const logger = require('./config/logger')
 
 const app = new Koa()
@@ -39,7 +38,7 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 // middlewares
-app.use(bodyparser())
+app.use(koaBody())
 app.use(json())
 if (process.env.NODE_ENV !== 'test') app.use(koaLogger())
 app.use(staticFiles(path.join(__dirname, '/public')))
@@ -67,6 +66,5 @@ app.use(async (ctx, next) => {
 
 // routes
 app.use(auth.routes(), auth.allowedMethods())
-graphqlRoutes(app)
 
 module.exports = app

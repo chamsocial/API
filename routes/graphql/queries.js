@@ -1,8 +1,8 @@
 const _ = require('lodash')
-const { AuthenticationError, ForbiddenError, ApolloError } = require('apollo-server-koa')
+const { GraphQLError } = require('graphql')
 const {
   Post, User, GroupContent, sequelize, Sequelize,
-  Message, MessageSubscriber, MessageThread, Op,
+  Message, MessageSubscriber, MessageThread, Blog, Op,
 } = require('../../models')
 const redis = require('../../config/redis')
 
@@ -49,7 +49,7 @@ const queries = {
   post: (parent, { slug }) => (
     Post.findOne({ where: { slug, status: 'published' } })
       .then(post => {
-        if (!post) throw new ApolloError('NO_POSTS_FOUND')
+        if (!post) throw new GraphQLError('NO_POSTS_FOUND')
         return post
       })
   ),
@@ -60,7 +60,7 @@ const queries = {
 
 
   drafts(parent, args, { me }) {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
     return Post.findAll({
       where: { user_id: me.id, status: 'draft' },
       limit: 10,
@@ -68,9 +68,9 @@ const queries = {
     })
   },
   draft: async (parent, { postId }, { me }) => {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
     const post = await Post.findOne({ where: { id: postId, user_id: me.id } })
-    if (!post) throw new ForbiddenError('No draft exist!')
+    if (!post) throw new GraphQLError('No draft exist!')
     return post
   },
 
@@ -107,7 +107,7 @@ const queries = {
 
 
   messages: async (parent, args, { me }) => {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
 
     const messages = await MessageThread.findAll({
       include: [{
@@ -126,7 +126,7 @@ const queries = {
     return messages
   },
   messageThread: async (parent, { threadId }, { me }) => {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
 
     const thread = await MessageThread.findOne({
       where: { id: threadId },
@@ -137,7 +137,7 @@ const queries = {
         model: Message,
       }],
     })
-    if (!thread) throw new ApolloError('No message thread found')
+    if (!thread) throw new GraphQLError('No message thread found')
 
     const user = _.get(thread, 'MessageSubscribers[0]')
     if (user) await user.update({ seen: new Date() })
@@ -181,7 +181,7 @@ const queries = {
   },
 
   bookmarks: async (parent, args, { me }) => {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
 
     const bookmarks = await Post.findAll({
       include: {
@@ -196,7 +196,7 @@ const queries = {
   },
 
   postsCommented: async (parent, args, { me }) => {
-    if (!me) throw new AuthenticationError('You must be logged in.')
+    if (!me) throw new GraphQLError('You must be logged in.')
 
     const commentPosts = await sequelize.query(`
       SELECT
@@ -214,6 +214,20 @@ const queries = {
     `, { type: sequelize.QueryTypes.SELECT })
 
     return commentPosts
+  },
+
+  blog: async () => {
+    const blogPosts = Blog.findAll({
+      where: { status: 'published' },
+      order: [['created_at', 'DESC']],
+      limit: 100,
+    })
+    return blogPosts
+  },
+  blogPost: async (parent, { slug }) => {
+    const blogPost = await Blog.findOne({ where: { slug, status: 'published' } })
+    if (!blogPost) throw new GraphQLError('No blog post found')
+    return blogPost
   },
 }
 
