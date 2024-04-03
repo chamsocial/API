@@ -7,7 +7,7 @@ const messageMutations = {
   async message(_, { users, subject, message }, { me }) {
     if (!me) throw new GraphQLError('You must be logged in.')
     const validUsers = (users && users.length > 0)
-    const sendingToSelf = users.find(userId => String(userId) === String(me.id))
+    const sendingToSelf = users?.find(userId => String(userId) === String(me.id))
     const validSubject = subject.length > 2
     const validMessage = message.length > 2
     if (!validUsers || !validSubject || !validMessage || sendingToSelf) {

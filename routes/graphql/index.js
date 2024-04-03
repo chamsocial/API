@@ -36,7 +36,7 @@ async function startServer(httpServer, app) {
                   kind: ctx?.operation?.operation,
                   operationName: ctx?.operationName,
                   query: ctx?.request?.query,
-                  variables: ctx.request?.variables,
+                  variables: ctx?.request?.variables,
                   user: ctx?.context?.user,
                   path: err?.path,
                 })
