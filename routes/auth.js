@@ -1,16 +1,29 @@
 const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
+const Hashids = require('hashids/cjs')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
 const logger = require('../config/logger')
+const { User } = require('../models')
 
 
 const { UPLOADS_DIR } = process.env
+const hashids = new Hashids('ChamSocial', 10)
+
 
 router.get('/test', async ctx => {
   if (!ctx.user) throw new Error('Hmm')
   ctx.body = ctx.user
+})
+
+router.post('/unsubscribe/:user/:time', async ctx => {
+  const x = hashids.encode(123)
+  console.log(ctx.params)
+  const user = await User.findOne({ where: { id: ctx.params.user } })
+  console.log(user)
+
+  ctx.body = { success: true }
 })
 
 router.get('/logout', async ctx => {
