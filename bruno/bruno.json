@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "ChamSocial",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
