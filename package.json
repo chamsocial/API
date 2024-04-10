@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node bin/www",
-    "dev": "./node_modules/.bin/nodemon bin/www",
+    "dev": "TZ=UTC NODE_ENV=development ./node_modules/.bin/nodemon bin/www",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prd": "pm2 start bin/www",
