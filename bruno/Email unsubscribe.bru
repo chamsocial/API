@@ -1,0 +1,11 @@
+meta {
+  name: Email unsubscribe
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:7440/unsubscribe/{{user}}/{{time}}/1
+  body: none
+  auth: none
+}

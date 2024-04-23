@@ -1,16 +1,51 @@
 const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
+const Hashids = require('hashids/cjs')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
 const logger = require('../config/logger')
+const { User, GroupUser } = require('../models')
 
 
-const { UPLOADS_DIR } = process.env
+const { UPLOADS_DIR, HASHIDS_SALT } = process.env
+const hashids = new Hashids(HASHIDS_SALT, 15)
+
 
 router.get('/test', async ctx => {
+  if (process.env.NODE_ENV !== 'development') return
   if (!ctx.user) throw new Error('Hmm')
   ctx.body = ctx.user
+})
+
+router.get('/hash/:id', async ctx => {
+  if (process.env.NODE_ENV !== 'development') return
+  ctx.body = hashids.encode(ctx.params.id)
+})
+
+router.post('/unsubscribe/:user/:time/:group', async ctx => {
+  const { group } = ctx.params
+  const [userId] = hashids.decode(ctx.params.user)
+  const [time] = hashids.decode(ctx.params.time)
+  if (!userId || !time) throw new Error('Invalid user')
+  const dateTime = new Date(time)
+  const user = await User.findOne({ where: { id: userId, created_at: dateTime } })
+  if (!user) throw new Error('Invalid user')
+
+  if (group === 'daily') {
+    await GroupUser.update(
+      { type: 'none' },
+      { where: { user_id: userId, type: 'daily' } },
+    )
+  } else {
+    if (Number.isNaN(Number(group))) throw new Error('Invalid group')
+    await GroupUser.update(
+      { type: 'none' },
+      { where: { user_id: userId, group_id: group } },
+    )
+  }
+
+  ctx.body = { success: true }
 })
 
 router.get('/logout', async ctx => {

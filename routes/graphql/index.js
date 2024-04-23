@@ -12,6 +12,7 @@ async function startServer(httpServer, app) {
   const server = new ApolloServer({
     resolvers,
     typeDefs,
+    introspection: false,
     csrfPrevention: true,
     context: ({ ctx }) => ({ loaders, ctx, me: ctx.user }),
     formatError: error => {
@@ -24,7 +25,7 @@ async function startServer(httpServer, app) {
       return { message: 'An error', code: 'ERROR' }
     },
     plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginDrainHttpServer({ httpServer, path: '/graphql' }),
       {
         requestDidStart: requestContext => {
           console.log('🚀', requestContext.request.operationName)
