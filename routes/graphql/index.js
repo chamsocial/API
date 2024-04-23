@@ -1,6 +1,8 @@
 const { ApolloServer } = require('@apollo/server')
 const { koaMiddleware } = require('@as-integrations/koa')
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
+const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/disabled')
+const router = require('koa-router')()
 // eslint-disable-next-line import/extensions
 const graphqlUploadKoa = require('graphql-upload/graphqlUploadKoa.js')
 const resolvers = require('./resolvers')
@@ -25,7 +27,8 @@ async function startServer(httpServer, app) {
       return { message: 'An error', code: 'ERROR' }
     },
     plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer, path: '/graphql' }),
+      ApolloServerPluginLandingPageDisabled(),
+      ApolloServerPluginDrainHttpServer({ httpServer }),
       {
         requestDidStart: requestContext => {
           console.log('🚀', requestContext.request.operationName)
@@ -60,11 +63,13 @@ async function startServer(httpServer, app) {
     }),
   )
 
-  app.use(
+  router.all(
+    '/graphql',
     koaMiddleware(server, {
       context: ({ ctx }) => ({ loaders, ctx, me: ctx.user }),
     }),
   )
+  app.use(router.routes())
 }
 
 module.exports = startServer

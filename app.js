@@ -53,7 +53,7 @@ app.use(async (ctx, next) => {
     const status = ctx.status || 404
     if (status === 404) ctx.throw(404)
   } catch (err) {
-    logger.error('CHAM_EROR', err)
+    if (ctx.status !== 404) logger.error('CHAM_EROR', err)
     // will only respond with JSON
     ctx.status = err.statusCode || err.status || 500
     ctx.body = {
