@@ -27,6 +27,7 @@ router.post('/unsubscribe/:user/:time/:group', async ctx => {
   const { group } = ctx.params
   const [userId] = hashids.decode(ctx.params.user)
   const [time] = hashids.decode(ctx.params.time)
+  if (!userId || !time) throw new Error('Invalid user')
   const dateTime = new Date(time)
   const user = await User.findOne({ where: { id: userId, created_at: dateTime } })
   if (!user) throw new Error('Invalid user')
