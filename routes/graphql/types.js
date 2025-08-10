@@ -13,7 +13,7 @@ const types = {
   Post: {
     commentsCount: post => post.comments_count,
     canEdit: (post, args, { me }) => post.user_id === me.id,
-    group: async post => Group.findOne({ where: { id: post.group_id, lang: 'en' } }),
+    group: async post => Group.findOne({ where: { id: post.group_id, type: 'open' } }),
     author: post => User.findByPk(post.user_id),
     comments: post => Comment.findAll({
       where: {

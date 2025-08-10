@@ -8,6 +8,14 @@ module.exports = function MediaModel(sequelize, DataTypes) {
       },
       allowNull: false,
     },
+    post_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      references: {
+        model: 'posts',
+        key: 'id',
+      },
+      allowNull: true,
+    },
     filename: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     filepath: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     width: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },

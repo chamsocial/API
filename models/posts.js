@@ -46,7 +46,7 @@ module.exports = function PostModel(sequelize, DataTypes) {
   })
 
   Post.hasMediaAttribute = Sequelize.literal(
-    'EXISTS(SELECT id FROM media_relations WHERE media_relations.id = Post.id) AS hasMedia',
+    'EXISTS(SELECT id FROM media WHERE media.post_id = Post.id) AS hasMedia',
   )
   Post.publicFields = [
     'id',

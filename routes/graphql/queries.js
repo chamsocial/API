@@ -86,8 +86,7 @@ const queries = {
         )
         AS postCount
         FROM \`groups\`
-        WHERE slug != 'postmaster'
-        AND type = 'open'
+        WHERE type = 'open'
         ORDER BY postCount DESC;
       `,
       { type: sequelize.QueryTypes.SELECT },
@@ -206,7 +205,7 @@ const queries = {
       SELECT
         posts.id, posts.user_id, posts.slug, posts.group_id, posts.comments_count, posts.title,
         posts.created_at AS createdAt,
-        EXISTS(SELECT id FROM media_relations WHERE media_relations.id = posts.id) AS hasMedia,
+        EXISTS(SELECT id FROM media WHERE media.post_id = posts.id) AS hasMedia,
         COUNT(posts.id) AS commentsMade
       FROM posts
       JOIN comments ON comments.post_id = posts.id
