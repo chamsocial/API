@@ -63,7 +63,7 @@ const types = {
   Group: {
     subscription: (group, args, { me, loaders }) => {
       if (!me) throw new GraphQLError('You must be logged in.')
-      return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
+      return loaders.emailSubscriptions.load({ groupId: group.id, userId: me.id })
     },
   },
   Media: {
