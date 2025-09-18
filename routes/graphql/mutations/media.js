@@ -54,8 +54,8 @@ const mediaMutations = {
     mediaData.width = img.width
     mediaData.height = img.height
     mediaData.size = img.size
+    mediaData.post_id = postId
     const media = await Media.create(mediaData)
-    await media.addPosts([postId])
 
     return media
   },

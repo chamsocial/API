@@ -55,21 +55,8 @@ db.User.belongsToMany(db.Post, { through: 'bookmarks', as: 'bookmark' })
 db.Post.belongsToMany(db.User, { through: 'bookmarks', as: 'bookmark' })
 
 
-db.Post.belongsToMany(db.Media, {
-  through: {
-    model: db.MediaRelations,
-    unique: false,
-  },
-  foreignKey: 'id',
-})
-
-db.Media.belongsToMany(db.Post, {
-  through: {
-    model: db.MediaRelations,
-    unique: false,
-  },
-  foreignKey: 'media_id',
-})
+db.Post.hasMany(db.Media, { foreignKey: 'post_id' })
+db.Media.belongsTo(db.Post, { foreignKey: 'post_id' })
 
 
 // Trigger emails

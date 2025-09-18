@@ -4,7 +4,7 @@ const { GraphQLError } = require('graphql')
 // eslint-disable-next-line import/extensions
 const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const {
-  User, Comment, Post, GroupContent, Op,
+  User, Comment, Post, Group, Op,
 } = require('../../models')
 
 const types = {
@@ -13,7 +13,7 @@ const types = {
   Post: {
     commentsCount: post => post.comments_count,
     canEdit: (post, args, { me }) => post.user_id === me.id,
-    group: async post => GroupContent.findOne({ where: { group_id: post.group_id, lang: 'en' } }),
+    group: async post => Group.findOne({ where: { id: post.group_id, type: 'open' } }),
     author: post => User.findByPk(post.user_id),
     comments: post => Comment.findAll({
       where: {
@@ -61,10 +61,9 @@ const types = {
     createdAt: user => user.created_at || user.createdAt,
   },
   Group: {
-    id: group => group.group_id,
     subscription: (group, args, { me, loaders }) => {
       if (!me) throw new GraphQLError('You must be logged in.')
-      return loaders.emailSubscriptions.load({ groupId: group.group_id, userId: me.id })
+      return loaders.emailSubscriptions.load({ groupId: group.id, userId: me.id })
     },
   },
   Media: {

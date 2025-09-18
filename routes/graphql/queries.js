@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const { GraphQLError } = require('graphql')
 const {
-  Post, User, GroupContent, sequelize, Sequelize,
+  Post, User, Group, sequelize, Sequelize,
   Message, MessageSubscriber, MessageThread, Blog, Op,
 } = require('../../models')
 const redis = require('../../config/redis')
@@ -78,19 +78,22 @@ const queries = {
   groups: async () => {
     const groups = await sequelize.query(
       `
-        SELECT
-          groups_content.*,
-          (SELECT COUNT(*) FROM posts WHERE posts.group_id = groups_content.group_id) AS postCount
-        FROM groups_content
-        WHERE lang = 'en'
-        AND slug != 'postmaster'
-        ORDER BY postCount DESC
+        SELECT id, slug, title, description,
+        (
+          SELECT COUNT(*)
+          FROM posts
+          WHERE posts.group_id = groups.id
+        )
+        AS postCount
+        FROM \`groups\`
+        WHERE type = 'open'
+        ORDER BY postCount DESC;
       `,
       { type: sequelize.QueryTypes.SELECT },
     )
     return groups
   },
-  group: (parent, { slug }) => GroupContent.findOne({ where: { slug: String(slug) } }),
+  group: (parent, { slug }) => Group.findOne({ where: { slug: String(slug) } }),
 
 
   user: (parent, { slug }) => User.findOne({ where: { slug } }),
@@ -202,7 +205,7 @@ const queries = {
       SELECT
         posts.id, posts.user_id, posts.slug, posts.group_id, posts.comments_count, posts.title,
         posts.created_at AS createdAt,
-        EXISTS(SELECT id FROM media_relations WHERE media_relations.id = posts.id) AS hasMedia,
+        EXISTS(SELECT id FROM media WHERE media.post_id = posts.id) AS hasMedia,
         COUNT(posts.id) AS commentsMade
       FROM posts
       JOIN comments ON comments.post_id = posts.id
