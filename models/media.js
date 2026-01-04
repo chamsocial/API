@@ -15,6 +15,8 @@ module.exports = function MediaModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: true,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     filename: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     filepath: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
