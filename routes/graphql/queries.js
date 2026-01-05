@@ -209,7 +209,7 @@ const queries = {
         COUNT(posts.id) AS commentsMade
       FROM posts
       JOIN comments ON comments.post_id = posts.id
-      WHERE comments.user_id = 3506
+      WHERE comments.user_id = ${me.id}
       AND posts.status = 'published'
       GROUP BY posts.id
       ORDER BY posts.id DESC

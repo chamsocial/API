@@ -12,6 +12,8 @@ module.exports = function BlogModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: false,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   }, {
     tableName: 'blog',

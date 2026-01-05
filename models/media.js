@@ -7,6 +7,8 @@ module.exports = function MediaModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: false,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     post_id: {
       type: DataTypes.INTEGER.UNSIGNED,
