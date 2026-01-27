@@ -54,6 +54,10 @@ const types = {
   Comment: {
     createdAt: comment => comment.created_at || comment.createdAt,
     parentId: comment => comment.parent_id,
+    content: comment => {
+      if (!comment.user_id) return '[deleted]'
+      return comment.content
+    },
     author: comment => {
       if (!comment.user_id) return DELETED_USER
       return User.findByPk(comment.user_id)

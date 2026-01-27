@@ -42,6 +42,10 @@ const postMutations = {
     post.status = args.status
     post.group_id = args.groupId
 
+    if (args.status === 'published' && !post.slug) {
+      post.slug = await generateSlug(Post, args.title)
+    }
+
     await post.save()
     return post
   },
