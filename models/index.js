@@ -89,12 +89,16 @@ db.Message.addHook('afterCreate', message => {
 
 // Clean up physical files and thumbnails when media records are deleted
 db.Media.addHook('beforeDestroy', async media => {
+  if (!UPLOADS_DIR) {
+    logger.error('UPLOADS_DIR is not set, skipping file cleanup', { fileId: media.id })
+    return
+  }
   const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
 
   // Delete original file
   try {
     await fsUnlink(filePath)
-    console.log(`Deleted file: ${filePath}`)
+    logger.info(`Deleted file: ${filePath}`)
   } catch (err) {
     logger.error('FILE_CLEANUP_ERROR', {
       error: err, filePath, fileId: media.id, userId: media.user_id,
@@ -136,7 +140,7 @@ async function deleteThumbnailsRecursive(dir, targetFilename) {
         // Found a thumbnail - delete it
         try {
           await fsUnlink(fullPath)
-          console.log(`Deleted thumbnail: ${fullPath}`)
+          logger.info(`Deleted thumbnail: ${fullPath}`)
         } catch (err) {
           logger.error('THUMBNAIL_DELETE_ERROR', { error: err, path: fullPath })
         }

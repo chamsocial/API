@@ -150,14 +150,18 @@ async function findOrphanedFiles() {
     raw: true,
   })
 
-  // Create a Set of valid filenames for fast lookup
-  const validFiles = new Set(mediaRecords.map(m => m.filename))
+  // Create a Set of valid user_id/filename pairs for fast lookup
+  const validFiles = new Set(mediaRecords.map(m => `${m.user_id}/${m.filename}`))
   log(`Found ${validFiles.size} media records in database`)
   log('')
 
   // Find orphaned files (both original uploads and thumbnails)
   log('Identifying orphaned files...')
-  const orphanedFiles = allFiles.filter(file => !validFiles.has(file.filename))
+  const orphanedFiles = allFiles.filter(file => {
+    const parts = file.relativePath.split(path.sep)
+    const key = `${parts[0]}/${file.filename}`
+    return !validFiles.has(key)
+  })
 
   log(`Found ${orphanedFiles.length} orphaned files (uploads + thumbnails)`)
   log('')
@@ -197,6 +201,7 @@ async function findOrphanedFiles() {
 
   // Delete files if in delete mode
   let deletedCount = 0
+  let deletedSize = 0
   if (DELETE_MODE) {
     log('Deleting orphaned files...')
 
@@ -204,6 +209,7 @@ async function findOrphanedFiles() {
       try {
         await fs.unlink(file.fullPath)
         deletedCount++
+        deletedSize += file.size
         log(`  Deleted: ${file.relativePath}`)
       } catch (err) {
         log(`  Failed to delete ${file.relativePath}: ${err.message}`, 'ERROR')
@@ -227,6 +233,7 @@ async function findOrphanedFiles() {
     orphanedThumbnails,
     totalSize,
     deletedCount,
+    deletedSize,
   }
 }
 
@@ -260,7 +267,7 @@ async function main() {
     log(`Total size: ${formatBytes(result.totalSize)}`)
     if (DELETE_MODE) {
       log(`Files deleted: ${result.deletedCount}`)
-      log(`Disk space recovered: ${formatBytes(result.totalSize)}`)
+      log(`Disk space recovered: ${formatBytes(result.deletedSize)}`)
     } else {
       log(`Potential disk space recovery: ${formatBytes(result.totalSize)}`)
     }

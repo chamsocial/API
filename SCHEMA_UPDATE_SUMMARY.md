@@ -1,20 +1,15 @@
 # Schema Update Summary - API Project
 
 ## Overview
-Successfully updated the Sequelize models in `/Users/spathon/Sites/cham/API` to match the new Drizzle schema from the `bun-social` project.
+Successfully updated the Sequelize models to match the new Drizzle schema from the `bun-social` project.
 
 ## Changes Completed
 
-### 1. SQL Migration Scripts Created
-Location: `/Users/spathon/Sites/cham/API/migrations/`
+### 1. SQL Migration Script Created
+Location: `./migrations/`
 
-Six migration scripts have been created (see migrations/README.md for execution instructions):
-- **001_add_rate_limiting_fields_to_users.sql** - Adds brute force protection fields
-- **002_update_comments_foreign_key.sql** - Changes user_id to SET NULL on delete
-- **003_add_post_id_to_media.sql** - Adds direct post relationship to media
-- **004_add_posts_image_id_foreign_key.sql** - Adds image_id constraint
-- **005_add_performance_indexes.sql** - Creates 9 performance indexes
-- **006_update_groups_users_notification_type.sql** - Removes 'weekly' option
+Seven migrations combined into a single idempotent script (see migrations/README.md for execution instructions):
+- **combined.sql** - All schema changes in one file (001-007)
 
 ### 2. Sequelize Model Updates
 
@@ -88,18 +83,7 @@ mysqldump -u your_user -p your_database > backup_$(date +%Y%m%d_%H%M%S).sql
 
 ### Step 2: Run SQL Migrations
 ```bash
-cd /Users/spathon/Sites/cham/API/migrations
-
-# Option A: Run each script individually
-mysql -u your_user -p your_database < 001_add_rate_limiting_fields_to_users.sql
-mysql -u your_user -p your_database < 002_update_comments_foreign_key.sql
-mysql -u your_user -p your_database < 003_add_post_id_to_media.sql
-mysql -u your_user -p your_database < 004_add_posts_image_id_foreign_key.sql
-mysql -u your_user -p your_database < 005_add_performance_indexes.sql
-mysql -u your_user -p your_database < 006_update_groups_users_notification_type.sql
-
-# Option B: Run all at once
-cat 00*.sql | mysql -u your_user -p your_database
+mysql -u your_user -p your_database < ./migrations/combined.sql
 ```
 
 ### Step 3: Verify Database Changes
@@ -174,16 +158,16 @@ npm start
 ## Files Modified
 
 ### Created:
-- `/Users/spathon/Sites/cham/API/migrations/*.sql` (7 files)
+- `./migrations/combined.sql`
 
 ### Modified:
-- `/Users/spathon/Sites/cham/API/models/users.js`
-- `/Users/spathon/Sites/cham/API/models/comment.js`
-- `/Users/spathon/Sites/cham/API/models/media.js`
-- `/Users/spathon/Sites/cham/API/models/posts.js`
-- `/Users/spathon/Sites/cham/API/models/groups.js`
-- `/Users/spathon/Sites/cham/API/models/groupsUsers.js`
-- `/Users/spathon/Sites/cham/API/models/index.js`
+- `./models/users.js`
+- `./models/comment.js`
+- `./models/media.js`
+- `./models/posts.js`
+- `./models/groups.js`
+- `./models/groupsUsers.js`
+- `./models/index.js`
 
 ## Rollback Plan
 

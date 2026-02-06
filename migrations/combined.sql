@@ -163,6 +163,25 @@ SELECT '003 done: media.post_id FK + index added' AS status;
 
 
 -- ============================================================================
+-- 003b: Backfill media.post_id from media_relations (if table exists)
+-- ============================================================================
+
+SET @tbl_exists = (
+  SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'media_relations'
+);
+SET @sql = IF(@tbl_exists > 0,
+  'UPDATE `media` m JOIN `media_relations` mr ON mr.media_id = m.id AND mr.type = ''post'' SET m.post_id = mr.id WHERE m.post_id IS NULL',
+  'SELECT "media_relations table does not exist, skipping backfill" AS status'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SELECT '003b done: media.post_id backfilled from media_relations' AS status;
+
+
+-- ============================================================================
 -- 004: SKIPPED — image_id FK would be immediately removed by 007
 -- ============================================================================
 

@@ -343,7 +343,6 @@ If you encounter any issues:
 1. Check migration logs for errors
 2. Verify all environment variables are set (UPLOADS_DIR)
 3. Test on a staging environment first
-4. Review the implementation plan at `.claude/plans/iridescent-painting-quail.md`
 
 ---
 

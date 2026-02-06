@@ -20,11 +20,12 @@ const postMutations = {
     if (status === 'published' && !groupId) {
       throw new GraphQLError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
     }
-    const slug = await generateSlug(Post, title)
+    const cleanTitle = cleanContent(title)
+    const slug = await generateSlug(Post, cleanTitle)
 
     return Post.create({
       user_id: me.id,
-      title: cleanContent(title),
+      title: cleanTitle,
       content: cleanContent(content),
       status,
       slug,
@@ -43,7 +44,7 @@ const postMutations = {
     post.group_id = args.groupId
 
     if (args.status === 'published' && !post.slug) {
-      post.slug = await generateSlug(Post, args.title)
+      post.slug = await generateSlug(Post, post.title)
     }
 
     await post.save()
