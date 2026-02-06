@@ -34,8 +34,9 @@ const postMutations = {
   },
 
   async editPost(_, args, { me }) {
-    const post = await Post.findByPk(args.id)
     if (!me) throw new GraphQLError('You must be logged in.')
+    const post = await Post.findByPk(args.id)
+    if (!post) throw new GraphQLError('Post not found.')
     if (post.user_id !== me.id) throw new GraphQLError('You can\'t edit some one else post.')
 
     post.title = cleanContent(args.title)

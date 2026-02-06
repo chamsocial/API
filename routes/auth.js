@@ -112,7 +112,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   const ext = path.extname(cleanFilename).replace('.', '').toLowerCase()
   const mime = mimes[ext]
   if (
-    !isNumber.test(userId) && !isNumber.test(w) && !isNumber.test(h)
+    !isNumber.test(userId) || !isNumber.test(w) || !isNumber.test(h)
   ) throw new Error('Has to be numeric')
   if (!mime) throw new Error('Invalid file format')
   if (cleanFilename !== filename) throw new Error('Invalid file name')
@@ -125,7 +125,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   await fs.promises.access(file)
 
   const relThumbPath = path.join(userId, h, w)
-  const absThumbPath = path.join(process.env.THUMBNAIL_DIR, relThumbPath)
+  const absThumbPath = safePath(process.env.THUMBNAIL_DIR, userId, h, w)
   try {
     await fs.promises.stat(absThumbPath)
   } catch (e) {
