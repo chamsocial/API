@@ -159,6 +159,14 @@ async function findOrphanedFiles() {
   log('Identifying orphaned files...')
   const orphanedFiles = allFiles.filter(file => {
     const parts = file.relativePath.split(path.sep)
+
+    // Files at root level have no user subdirectory — flag as orphaned with warning
+    if (parts.length === 1) {
+      log(`  Root-level file (no user subdirectory): ${file.relativePath}`, 'WARN')
+      return true
+    }
+
+    // Expected: user_id/filename or user_id/.../filename (thumbnails)
     const key = `${parts[0]}/${file.filename}`
     return !validFiles.has(key)
   })
