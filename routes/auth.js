@@ -5,6 +5,7 @@ const Hashids = require('hashids/cjs')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
 const logger = require('../config/logger')
+const safePath = require('../utils/safePath')
 const { User, GroupUser } = require('../models')
 
 
@@ -76,7 +77,7 @@ router.get('/img/:h/:w/uploads/:userId/:filename', async ctx => {
   if (Number.isNaN(width) || width < 10 || width > 2000) width = 500
   if (Number.isNaN(height) || height < 10 || height > 2000) height = 500
 
-  const file = path.resolve(UPLOADS_DIR, userId, filename)
+  const file = safePath(UPLOADS_DIR, userId, filename)
   try {
     await fs.promises.access(file)
     ctx.body = sharp(file).resize(width, height)
@@ -120,7 +121,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   if (Number.isNaN(width) || width < 10 || width > 2000) width = 500
   if (Number.isNaN(height) || height < 10 || height > 2000) height = 500
 
-  const file = path.resolve(UPLOADS_DIR, userId, cleanFilename)
+  const file = safePath(UPLOADS_DIR, userId, cleanFilename)
   await fs.promises.access(file)
 
   const relThumbPath = path.join(userId, h, w)

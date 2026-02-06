@@ -17,7 +17,7 @@ module.exports = function PostModel(sequelize, DataTypes) {
       onUpdate: 'CASCADE',
     },
     status: { type: DataTypes.ENUM('draft', 'published', 'deleted'), allowNull: false, defaultValue: 'draft' },
-    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+    slug: { type: DataTypes.STRING, allowNull: true, unique: true },
     group_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {

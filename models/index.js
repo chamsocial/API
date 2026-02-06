@@ -11,6 +11,8 @@ const config = require('../config/db')[env]
 const redisClient = require('../config/redis')
 const logger = require('../config/logger')
 
+const safePath = require('../utils/safePath')
+
 const { UPLOADS_DIR, THUMBNAIL_DIR } = process.env
 
 const db = {}
@@ -93,7 +95,19 @@ db.Media.addHook('beforeDestroy', async media => {
     logger.error('UPLOADS_DIR is not set, skipping file cleanup', { fileId: media.id })
     return
   }
-  const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
+  let filePath
+  let userThumbDir
+  try {
+    filePath = safePath(UPLOADS_DIR, String(media.user_id), media.filename)
+    if (THUMBNAIL_DIR) {
+      userThumbDir = safePath(THUMBNAIL_DIR, String(media.user_id))
+    }
+  } catch (err) {
+    logger.error('PATH_TRAVERSAL_BLOCKED', {
+      error: err.message, fileId: media.id, userId: media.user_id, filename: media.filename,
+    })
+    return
+  }
 
   // Delete original file
   try {
@@ -107,8 +121,7 @@ db.Media.addHook('beforeDestroy', async media => {
   }
 
   // Delete all generated thumbnails for this file
-  if (THUMBNAIL_DIR) {
-    const userThumbDir = path.resolve(THUMBNAIL_DIR, String(media.user_id))
+  if (userThumbDir) {
     try {
       // Check if user thumbnail directory exists
       const stat = await fs.promises.stat(userThumbDir)
