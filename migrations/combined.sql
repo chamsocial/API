@@ -170,6 +170,8 @@ SET @tbl_exists = (
   SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES
   WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'media_relations'
 );
+-- NOTE: mr.id is the entity/post ID (composite PK column), not an auto-increment PK.
+-- The old media_relations model used (id, media_id, type) where id = the related entity's PK.
 SET @sql = IF(@tbl_exists > 0,
   'UPDATE `media` m JOIN `media_relations` mr ON mr.media_id = m.id AND mr.type = ''post'' SET m.post_id = mr.id WHERE m.post_id IS NULL',
   'SELECT "media_relations table does not exist, skipping backfill" AS status'

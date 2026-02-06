@@ -113,7 +113,7 @@ SHOW COLUMNS FROM groups_users WHERE Field = 'type';
 
 ### Step 4: Test API
 ```bash
-cd /Users/spathon/Sites/cham/API
+cd /path/to/API
 
 # Start API server
 npm start
