@@ -141,7 +141,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   const absThumbFile = path.join(absThumbPath, cleanFilename)
   await sharp(file).resize(width, height).toFile(absThumbFile)
 
-  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', relThumbPath, cleanFilename))
+  ctx.set('X-Accel-Redirect', path.join('/thumb/', relThumbPath, cleanFilename))
   ctx.set('Content-Type', mime)
   ctx.body = 'OK'
 })
