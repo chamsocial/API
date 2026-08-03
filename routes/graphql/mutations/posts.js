@@ -4,10 +4,17 @@ const { Post } = require('../../../models')
 const { cleanContent } = require('../../../utils/content')
 
 
+function timestampSlug(slug) {
+  // Keep room for the suffix — truncating after appending would return a
+  // 200-char base unchanged and keep the collision
+  const suffix = `-${Date.now()}`
+  return slug.substr(0, 200 - suffix.length) + suffix
+}
+
 async function generateSlug(Model, name) {
   const slug = slugify(name, { lower: true }).substr(0, 200)
   const slugExist = await Model.findOne({ where: { slug } })
-  if (slugExist) return `${slug}-${Date.now()}`.substr(0, 200)
+  if (slugExist) return timestampSlug(slug)
   return slug
 }
 
@@ -42,11 +49,18 @@ const postMutations = {
     post.status = args.status
     post.group_id = args.groupId
     // Drafts from the new app have no slug until published
-    if (!post.slug && post.status === 'published') {
-      post.slug = await generateSlug(Post, post.title)
-    }
+    const mintedSlug = !post.slug && post.status === 'published'
+    if (mintedSlug) post.slug = await generateSlug(Post, post.title)
 
-    await post.save()
+    try {
+      await post.save()
+    } catch (err) {
+      // slug is the only unique key — a concurrent publish won the
+      // check-then-save race, so retry once with a timestamped slug
+      if (!mintedSlug || err.name !== 'SequelizeUniqueConstraintError') throw err
+      post.slug = timestampSlug(post.slug)
+      await post.save()
+    }
     return post
   },
 
