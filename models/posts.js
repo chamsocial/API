@@ -15,7 +15,8 @@ module.exports = function PostModel(sequelize, DataTypes) {
       allowNull: false,
     },
     status: { type: DataTypes.ENUM('draft', 'published', 'deleted'), allowNull: false, defaultValue: 'draft' },
-    slug: { type: DataTypes.STRING, allowNull: false, unique: true },
+    // Nullable since the new app creates drafts with slug NULL until publish
+    slug: { type: DataTypes.STRING, allowNull: true, unique: true },
     group_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {

@@ -64,7 +64,7 @@ type PostsList {
 type Post {
   id: ID!
   title: String!
-  slug: String!
+  slug: String
   status: PostStatus
   content: String
   htmlContent: String

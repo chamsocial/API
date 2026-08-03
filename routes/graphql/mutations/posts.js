@@ -41,6 +41,10 @@ const postMutations = {
     post.content = cleanContent(args.content)
     post.status = args.status
     post.group_id = args.groupId
+    // Drafts from the new app have no slug until published
+    if (!post.slug && post.status === 'published') {
+      post.slug = await generateSlug(Post, post.title)
+    }
 
     await post.save()
     return post
