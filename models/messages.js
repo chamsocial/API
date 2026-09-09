@@ -15,6 +15,8 @@ module.exports = function MessageModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: false,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     subject: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     message: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },

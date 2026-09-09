@@ -7,6 +7,26 @@ const {
   User, Comment, Post, Group, Op,
 } = require('../../models')
 
+// Deleted user representation for comments from deleted users
+const DELETED_USER = {
+  id: 0,
+  username: '[deleted]',
+  slug: 'deleted',
+  first_name: '',
+  last_name: '',
+  company_name: '',
+  is_company: false,
+  location: '',
+  interests: '',
+  aboutme: '',
+  jobtitle: '',
+  lang: 'en',
+  role: 0,
+  activated: false,
+  created_at: null,
+  email: 'deleted@deleted.local',
+}
+
 const types = {
   Upload: GraphQLUpload,
   DateTime: GraphQLDateTime,
@@ -34,7 +54,14 @@ const types = {
   Comment: {
     createdAt: comment => comment.created_at || comment.createdAt,
     parentId: comment => comment.parent_id,
-    author: comment => User.findByPk(comment.user_id),
+    content: comment => {
+      if (!comment.user_id) return '[deleted]'
+      return comment.content
+    },
+    author: comment => {
+      if (!comment.user_id) return DELETED_USER
+      return User.findByPk(comment.user_id)
+    },
     comments: comment => Comment.findAll({ where: { parent_id: comment.id }, limit: 500 }),
   },
   User: {

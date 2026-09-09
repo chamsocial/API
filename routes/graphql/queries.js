@@ -209,12 +209,12 @@ const queries = {
         COUNT(posts.id) AS commentsMade
       FROM posts
       JOIN comments ON comments.post_id = posts.id
-      WHERE comments.user_id = 3506
+      WHERE comments.user_id = :userId
       AND posts.status = 'published'
       GROUP BY posts.id
       ORDER BY posts.id DESC
       LIMIT 200
-    `, { type: sequelize.QueryTypes.SELECT })
+    `, { replacements: { userId: me.id }, type: sequelize.QueryTypes.SELECT })
 
     return commentPosts
   },

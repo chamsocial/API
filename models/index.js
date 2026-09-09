@@ -1,11 +1,19 @@
 const fs = require('fs')
 const path = require('path')
+const { promisify } = require('util')
 const Sequelize = require('sequelize')
+
+const fsUnlink = promisify(fs.unlink)
 
 const basename = path.basename(module.filename)
 const env = process.env.NODE_ENV || 'development'
 const config = require('../config/db')[env]
 const redisClient = require('../config/redis')
+const logger = require('../config/logger')
+
+const safePath = require('../utils/safePath')
+
+const { UPLOADS_DIR, THUMBNAIL_DIR } = process.env
 
 const db = {}
 
@@ -80,6 +88,81 @@ db.Post.addHook('afterUpdate', (post, options) => {
 db.Message.addHook('afterCreate', message => {
   triggerEmail('new_pm', { message_id: message.id })
 })
+
+// Clean up physical files and thumbnails when media records are deleted
+db.Media.addHook('beforeDestroy', async media => {
+  if (!UPLOADS_DIR) {
+    logger.error('UPLOADS_DIR is not set, skipping file cleanup', { fileId: media.id })
+    return
+  }
+  let filePath
+  let userThumbDir
+  try {
+    filePath = safePath(UPLOADS_DIR, String(media.user_id), media.filename)
+    if (THUMBNAIL_DIR) {
+      userThumbDir = safePath(THUMBNAIL_DIR, String(media.user_id))
+    }
+  } catch (err) {
+    logger.error('PATH_TRAVERSAL_BLOCKED', {
+      error: err.message, fileId: media.id, userId: media.user_id, filename: media.filename,
+    })
+    return
+  }
+
+  // Delete original file
+  try {
+    await fsUnlink(filePath)
+    logger.info(`Deleted file: ${filePath}`)
+  } catch (err) {
+    logger.error('FILE_CLEANUP_ERROR', {
+      error: err, filePath, fileId: media.id, userId: media.user_id,
+    })
+    // Don't throw - allow DB deletion to proceed even if file delete fails
+  }
+
+  // Delete all generated thumbnails for this file
+  if (userThumbDir) {
+    try {
+      // Check if user thumbnail directory exists
+      const stat = await fs.promises.stat(userThumbDir)
+      if (stat.isDirectory()) {
+        // Recursively scan for all thumbnails of this file
+        await deleteThumbnailsRecursive(userThumbDir, media.filename)
+      }
+    } catch (err) {
+      // Directory doesn't exist or other error - log but don't fail
+      logger.error('THUMBNAIL_CLEANUP_ERROR', {
+        error: err, userThumbDir, fileId: media.id, userId: media.user_id,
+      })
+    }
+  }
+})
+
+// Helper function to recursively delete thumbnails
+async function deleteThumbnailsRecursive(dir, targetFilename) {
+  try {
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true })
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name)
+
+      if (entry.isDirectory()) {
+        // Recursively scan subdirectories
+        await deleteThumbnailsRecursive(fullPath, targetFilename)
+      } else if (entry.isFile() && entry.name === targetFilename) {
+        // Found a thumbnail - delete it
+        try {
+          await fsUnlink(fullPath)
+          logger.info(`Deleted thumbnail: ${fullPath}`)
+        } catch (err) {
+          logger.error('THUMBNAIL_DELETE_ERROR', { error: err, path: fullPath })
+        }
+      }
+    }
+  } catch (err) {
+    logger.error('THUMBNAIL_SCAN_ERROR', { error: err, dir })
+  }
+}
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
