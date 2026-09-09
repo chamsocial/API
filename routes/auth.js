@@ -5,6 +5,7 @@ const Hashids = require('hashids/cjs')
 const router = require('koa-router')()
 const sanitizeFilename = require('sanitize-filename')
 const logger = require('../config/logger')
+const safePath = require('../utils/safePath')
 const { User, GroupUser } = require('../models')
 
 
@@ -76,7 +77,7 @@ router.get('/img/:h/:w/uploads/:userId/:filename', async ctx => {
   if (Number.isNaN(width) || width < 10 || width > 2000) width = 500
   if (Number.isNaN(height) || height < 10 || height > 2000) height = 500
 
-  const file = path.resolve(UPLOADS_DIR, userId, filename)
+  const file = safePath(UPLOADS_DIR, userId, filename)
   try {
     await fs.promises.access(file)
     ctx.body = sharp(file).resize(width, height)
@@ -111,7 +112,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   const ext = path.extname(cleanFilename).replace('.', '').toLowerCase()
   const mime = mimes[ext]
   if (
-    !isNumber.test(userId) && !isNumber.test(w) && !isNumber.test(h)
+    !isNumber.test(userId) || !isNumber.test(w) || !isNumber.test(h)
   ) throw new Error('Has to be numeric')
   if (!mime) throw new Error('Invalid file format')
   if (cleanFilename !== filename) throw new Error('Invalid file name')
@@ -120,11 +121,11 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   if (Number.isNaN(width) || width < 10 || width > 2000) width = 500
   if (Number.isNaN(height) || height < 10 || height > 2000) height = 500
 
-  const file = path.resolve(UPLOADS_DIR, userId, cleanFilename)
+  const file = safePath(UPLOADS_DIR, userId, cleanFilename)
   await fs.promises.access(file)
 
   const relThumbPath = path.join(userId, h, w)
-  const absThumbPath = path.join(process.env.THUMBNAIL_DIR, relThumbPath)
+  const absThumbPath = safePath(process.env.THUMBNAIL_DIR, userId, h, w)
   try {
     await fs.promises.stat(absThumbPath)
   } catch (e) {
@@ -140,7 +141,7 @@ router.get('/thumb/:userId/:h/:w/:filename', missingImage, async ctx => {
   const absThumbFile = path.join(absThumbPath, cleanFilename)
   await sharp(file).resize(width, height).toFile(absThumbFile)
 
-  ctx.set('X-Accel-Redirect', path.join('/secret-media', '/thumb/', relThumbPath, cleanFilename))
+  ctx.set('X-Accel-Redirect', path.join('/thumb/', relThumbPath, cleanFilename))
   ctx.set('Content-Type', mime)
   ctx.body = 'OK'
 })

@@ -7,6 +7,8 @@ module.exports = function ActivationModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: false,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     code: { type: DataTypes.STRING(42), allowNull: false, defaultValue: '' },
     verified_at: { type: DataTypes.DATE, allowNull: true },

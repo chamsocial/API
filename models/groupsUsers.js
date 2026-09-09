@@ -8,6 +8,8 @@ module.exports = function groupsContentModel(sequelize, DataTypes) {
       },
       allowNull: false,
       primaryKey: true,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     group_id: {
       type: DataTypes.INTEGER.UNSIGNED,

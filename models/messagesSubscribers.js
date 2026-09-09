@@ -17,6 +17,8 @@ module.exports = function MessageSubscriberModel(sequelize, DataTypes) {
         key: 'id',
       },
       allowNull: false,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     seen: { type: DataTypes.DATE, allowNull: true },
   }, {

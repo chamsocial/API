@@ -5,11 +5,9 @@ const sharp = require('sharp')
 const { v4: uuidv4 } = require('uuid')
 const { GraphQLError } = require('graphql')
 const { Media } = require('../../../models')
-const logger = require('../../../config/logger')
 
 const fsStat = promisify(fs.stat)
 const fsMkdir = promisify(fs.mkdir)
-const fsUnlink = promisify(fs.unlink)
 
 const { UPLOADS_DIR } = process.env
 
@@ -65,14 +63,7 @@ const mediaMutations = {
     if (!media) throw new GraphQLError('No file found')
     if (media.user_id !== me.id) throw new GraphQLError('No, just no!')
 
-    const filePath = path.resolve(UPLOADS_DIR, String(media.user_id), media.filename)
-    try {
-      await fsUnlink(filePath)
-    } catch (err) {
-      logger.error('DELETE_FILE_ERROR', {
-        error: err, filePath, fileId: media.id, userId: me.id,
-      })
-    }
+    // File deletion handled in model hook
     await media.destroy({ force: true })
 
     return id

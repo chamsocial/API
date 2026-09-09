@@ -27,11 +27,12 @@ const postMutations = {
     if (status === 'published' && !groupId) {
       throw new GraphQLError('Group missing', { errors: [{ message: 'A group has to be selected' }] })
     }
-    const slug = await generateSlug(Post, title)
+    const cleanTitle = cleanContent(title)
+    const slug = await generateSlug(Post, cleanTitle)
 
     return Post.create({
       user_id: me.id,
-      title: cleanContent(title),
+      title: cleanTitle,
       content: cleanContent(content),
       status,
       slug,
@@ -40,8 +41,9 @@ const postMutations = {
   },
 
   async editPost(_, args, { me }) {
-    const post = await Post.findByPk(args.id)
     if (!me) throw new GraphQLError('You must be logged in.')
+    const post = await Post.findByPk(args.id)
+    if (!post) throw new GraphQLError('Post not found.')
     if (post.user_id !== me.id) throw new GraphQLError('You can\'t edit some one else post.')
 
     post.title = cleanContent(args.title)
