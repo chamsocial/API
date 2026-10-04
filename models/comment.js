@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
     },
     parent_id: { type: DataTypes.INTEGER.UNSIGNED, default: null },
-    email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
+    email_message_id: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     content: {
       type: DataTypes.TEXT,
