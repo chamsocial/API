@@ -27,7 +27,7 @@ module.exports = function PostModel(sequelize, DataTypes) {
       allowNull: false,
     },
     comments_count: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-    email_message_id: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
+    email_message_id: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
     made_in: { type: DataTypes.ENUM('web', 'email'), allowNull: false, defaultValue: 'web' },
     title: { type: DataTypes.STRING, allowNull: false, defaultValue: '' },
     content: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
