@@ -7,6 +7,20 @@ const resetPasswordEmail = require('../../../emails/resetPassword')
 const { cleanContent } = require('../../../utils/content')
 
 
+/**
+ * Find the account for a login or reset identifier, email match first.
+ *
+ * Signup used to accept a username equal to another account's email. With a plain
+ * `username = x OR email = x` the row MySQL returns first wins, so that username
+ * could take over the email owner's login and reset.
+ */
+async function findByLogin(identifier) {
+  const byEmail = await User.findOne({ where: { email: identifier } })
+  if (byEmail) return byEmail
+  return User.findOne({ where: { username: identifier } })
+}
+
+
 function invalidUserError(title = 'Invalid username or password') {
   const error = new GraphQLError(title)
   error.status = 401
@@ -18,7 +32,7 @@ const auth = {
   async login(_, { username, password }, context) {
     if (!username || !password) throw invalidUserError()
 
-    const user = await User.findOne({ where: { [Op.or]: [{ username }, { email: username }] } })
+    const user = await findByLogin(username)
     if (!user) throw invalidUserError()
 
     const activationText = 'The account has not been activated yet. If you have not received the email try to reset your password.'
@@ -36,7 +50,7 @@ const auth = {
   async forgotPassword(parent, { username }) {
     if (!username) return false
 
-    const user = await User.findOne({ where: { [Op.or]: [{ username }, { email: username }] } })
+    const user = await findByLogin(username)
     if (!user) return false
 
     const token = uuidv4()
@@ -64,6 +78,10 @@ const auth = {
   },
 
   async createUser(_, { username, email, password }, { ctx }) {
+    // An @ would let a username match another account's email in findByLogin
+    if (username.includes('@')) {
+      return { success: false, error: { message: 'The username can\'t contain @' } }
+    }
     const user = await User.findOne({ where: { [Op.or]: [{ username }, { email }] } })
     if (user) {
       const inUse = []
