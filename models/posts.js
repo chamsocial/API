@@ -1,7 +1,4 @@
-const showdown = require('showdown')
 const Sequelize = require('sequelize')
-
-const converter = new showdown.Converter()
 
 
 module.exports = function PostModel(sequelize, DataTypes) {
@@ -38,11 +35,6 @@ module.exports = function PostModel(sequelize, DataTypes) {
       get() { return this.getDataValue('hasMedia') },
     },
   }, {
-    getterMethods: {
-      htmlContent() {
-        return converter.makeHtml(this.getDataValue('content'))
-      },
-    },
     tableName: 'posts',
     underscored: true,
     deletedAt: false,

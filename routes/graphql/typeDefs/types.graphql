@@ -67,7 +67,6 @@ type Post {
   slug: String
   status: PostStatus
   content: String
-  htmlContent: String
   createdAt: DateTime
   commentsCount: Int
   author: User
